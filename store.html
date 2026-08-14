@@ -146,13 +146,22 @@
     <div class="checkout-section">
       <h2>📦 Order & Choose Address 📦</h2>
       
-      <!-- CUSTOMER NAME INPUT -->
-      <input type="text" id="cust-name" placeholder="Your Name" required><br>
+      <!-- NAME DROP-DOWN -->
+      <select id="cust-name" required>
+        <option value="" disabled selected>-- Select Your Name --</option>
+        <option value="Arthur">Arthur</option>
+        <option value="Denise">Denise</option>
+        <option value="Josh">Josh</option>
+        <option value="Luna">Luna</option>
+      </select><br>
 
-      <!-- ITEM SELECTION DROP-DOWN -->
+      <!-- ITEM DROP-DOWN -->
       <select id="cust-item" required>
         <option value="" disabled selected>-- Select Item to Order --</option>
       </select><br>
+
+      <!-- QUANTITY INPUT -->
+      <input type="number" id="cust-qty" placeholder="Quantity (e.g., 2)" min="1" value="1" required><br>
       
       <!-- ADDRESS DROP-DOWN -->
       <select id="cust-address" required>
@@ -197,7 +206,6 @@
       const container = document.getElementById('product-container');
       const products = getProducts();
 
-      // Update the Order Tab dropdown menu automatically
       updateItemDropdown(products);
 
       if (products.length === 0) {
@@ -262,10 +270,11 @@
     function sendOrder() {
       const customer = document.getElementById('cust-name').value;
       const item = document.getElementById('cust-item').value;
+      const quantity = document.getElementById('cust-qty').value;
       const address = document.getElementById('cust-address').value;
 
-      if (!customer || !item || !address) {
-        alert('Please fill in your name, select an item, and select an address!');
+      if (!customer || !item || !quantity || !address) {
+        alert('Please select a name, item, quantity, and address!');
         return;
       }
 
@@ -273,7 +282,7 @@
       const FORMSPREE_URL = "https://formspree.io/f/maewbvzr";
 
       if (FORMSPREE_URL.includes("maewbvzr")) {
-        alert(`Order Placed!\n\nCustomer Name: ${customer}\nItem Ordered: ${item}\nDelivery Address: ${address}\n\n(To receive real emails, paste your Formspree link into line 192!)`);
+        alert(`Order Placed!\n\nCustomer Name: ${customer}\nItem Ordered: ${item}\nQuantity: ${quantity}\nDelivery Address: ${address}\n\n(To receive real emails, paste your Formspree link into line 211!)`);
       } else {
         fetch(FORMSPREE_URL, {
           method: 'POST',
@@ -281,14 +290,16 @@
           body: JSON.stringify({
             "Customer Name": customer,
             "Item Ordered": item,
+            "Quantity": quantity,
             "Delivery Address": address
           })
         })
         .then(res => {
           if (res.ok) {
             alert('Order sent successfully!');
-            document.getElementById('cust-name').value = '';
+            document.getElementById('cust-name').selectedIndex = 0;
             document.getElementById('cust-item').selectedIndex = 0;
+            document.getElementById('cust-qty').value = '1';
             document.getElementById('cust-address').selectedIndex = 0;
           } else {
             alert('Failed to send order. Check your Formspree URL.');
