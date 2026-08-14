@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -145,9 +145,19 @@
     <!-- CHECKOUT SECTION -->
     <div class="checkout-section">
       <h2>📦 Order & Choose Address 📦</h2>
-      <input type="text" id="cust-name" placeholder="Your Name" required><br>
+      
+      <!-- NAME DROP-DOWN -->
+      <select id="cust-name" required>
+        <option value="" disabled selected>-- Select Your Name --</option>
+        <option value="George">George</option>
+        <option value="Harold">Harold</option>
+        <option value="Dog Man">Dog Man</option>
+        <option value="Petey">Petey</option>
+      </select><br>
+
       <input type="text" id="cust-item" placeholder="Item Name Buying" required><br>
       
+      <!-- ADDRESS DROP-DOWN -->
       <select id="cust-address" required>
         <option value="" disabled selected>-- Select Delivery Address --</option>
         <option value="Bomboklat street">Bomboklat street</option>
@@ -163,7 +173,6 @@
   <div id="product-container" class="grid"></div>
 
   <script>
-    // LOCAL STORAGE ITEM MANAGEMENT
     function getProducts() {
       const data = localStorage.getItem('dogman_products');
       return data ? JSON.parse(data) : [];
@@ -235,22 +244,21 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // FORMSPREE EMAIL ORDER SUBMISSION
     function sendOrder() {
       const customer = document.getElementById('cust-name').value;
       const item = document.getElementById('cust-item').value;
       const address = document.getElementById('cust-address').value;
 
       if (!customer || !item || !address) {
-        alert('Please fill in your name, item, and select an address!');
+        alert('Please select your name, item, and address!');
         return;
       }
 
-      // 🔴 PASTE YOUR FORMSPREE URL HERE (e.g., "https://formspree.io/f/xyzvqwbz"):
+      // 🔴 PASTE YOUR FORMSPREE LINK HERE:
       const FORMSPREE_URL = "https://formspree.io/f/maewbvzr";
 
       if (FORMSPREE_URL.includes("YOUR_FORM_ID_HERE")) {
-        alert("Order received in demo mode!\n\nTo send actual emails to your inbox, paste your Formspree link into line 182 of the code.");
+        alert("Order received in demo mode!\n\nTo send actual emails to your inbox, paste your Formspree link into line 191 of the code.");
         return;
       }
 
@@ -266,7 +274,7 @@
       .then(res => {
         if (res.ok) {
           alert('Order sent successfully! Check your email inbox.');
-          document.getElementById('cust-name').value = '';
+          document.getElementById('cust-name').selectedIndex = 0;
           document.getElementById('cust-item').value = '';
           document.getElementById('cust-address').selectedIndex = 0;
         } else {
