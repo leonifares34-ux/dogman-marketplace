@@ -100,7 +100,7 @@
       object-fit: contain;
     }
     .price {
-      color: #ff3333; /* Supa Red */
+      color: #ff3333;
       font-size: 1.3em;
       margin: 10px 0;
     }
@@ -125,6 +125,9 @@
     }
     .delete-btn:hover { background-color: #cc0000; }
   </style>
+
+  <!-- SUPABASE LIBRARY -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -133,16 +136,16 @@
   </header>
 
   <div class="container">
-    <!-- 1. SELLER ADD ITEM SECTION -->
+    <!-- 1. SELLER SECTION -->
     <div class="seller-section">
       <h2>⚡ Sell Supa Merch ⚡</h2>
       <input type="text" id="title" placeholder="Item Name (e.g., Supa Buddy Pin)" required><br>
       <input type="number" id="price" placeholder="Price ($)" step="0.01" required><br>
       <input type="url" id="image" placeholder="Image URL (http://...)" required><br>
-      <button class="seller-btn" onclick="addItem()">List Item for Sale!</button>
+      <button class="seller-btn" onclick="addItem()">List Item to Supabase!</button>
     </div>
 
-    <!-- 2. CHECKOUT & ADDRESS SELECTION SECTION -->
+    <!-- 2. CHECKOUT SECTION -->
     <div class="checkout-section">
       <h2>📦 Order & Choose Address 📦</h2>
       <input type="text" id="cust-name" placeholder="Your Name" required><br>
@@ -159,33 +162,51 @@
     </div>
   </div>
 
-  <!-- MARKETPLACE PRODUCTS GRID -->
-  <div id="product-container" class="grid">Loading Supa Products...</div>
+  <!-- PRODUCTS GRID -->
+  <div id="product-container" class="grid">Loading items from Supabase database...</div>
 
   <script>
-    // 1. Fetch initial products from FakeStoreAPI
-    fetch('https://fakestoreapi.com/products?limit=6')
-      .then(res => res.json())
-      .then(products => {
-        const container = document.getElementById('product-container');
-        container.innerHTML = products.map(item => createCardHtml(item.title, item.price, item.image)).join('');
-      });
+    // YOUR LIVE SUPABASE CREDENTIALS
+    const SUPABASE_URL = "https://vretpcrozplkpqjzaudn.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_XbD6xgyJNAr-ia39HrKORA_S-9crrjD";
 
-    // 2. Helper function to create product cards with a Delete button
-    function createCardHtml(title, price, image) {
-      return `
-        <div class="card">
-          <img src="${image}" alt="${title}">
-          <h4>${title.length > 25 ? title.substring(0, 25) + '...' : title}</h4>
-          <div class="price">$${price}</div>
-          <button class="buy-btn" onclick="quickBuy('${title.replace(/'/g, "\\'")}')">Buy Item</button><br>
-          <button class="delete-btn" onclick="this.parentElement.remove()">Delete Pack</button>
-        </div>
-      `;
+    // Initialize Client
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // FETCH items from Supabase database
+    async function fetchProducts() {
+      const container = document.getElementById('product-container');
+      const { data: products, error } = await supabase
+        .from('products')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (error) {
+        container.innerHTML = `<p>Error loading items: ${error.message}</p>`;
+        return;
+      }
+
+      if (!products || products.length === 0) {
+        container.innerHTML = '<p>No items in database yet. Add one above!</p>';
+        return;
+      }
+
+      container.innerHTML = products.map(item => {
+        const safeTitle = item.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        return `
+          <div class="card">
+            <img src="${item.image}" alt="${safeTitle}">
+            <h4>${item.title.length > 25 ? item.title.substring(0, 25) + '...' : item.title}</h4>
+            <div class="price">$${item.price}</div>
+            <button class="buy-btn" onclick="quickBuy('${safeTitle}')">Buy Item</button><br>
+            <button class="delete-btn" onclick="deleteItem(${item.id})">Delete Item</button>
+          </div>
+        `;
+      }).join('');
     }
 
-    // 3. Function to add new seller item to the page
-    function addItem() {
+    // ADD a new item into Supabase database
+    async function addItem() {
       const title = document.getElementById('title').value;
       const price = document.getElementById('price').value;
       const image = document.getElementById('image').value;
@@ -195,24 +216,41 @@
         return;
       }
 
-      const container = document.getElementById('product-container');
-      const newCardHtml = createCardHtml(title, price, image);
-      
-      container.insertAdjacentHTML('afterbegin', newCardHtml);
+      const { error } = await supabase
+        .from('products')
+        .insert([{ title, price, image }]);
 
-      // Clear input fields
-      document.getElementById('title').value = '';
-      document.getElementById('price').value = '';
-      document.getElementById('image').value = '';
+      if (error) {
+        alert('Error adding item: ' + error.message);
+      } else {
+        document.getElementById('title').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('image').value = '';
+        fetchProducts();
+      }
     }
 
-    // Helper function to auto-fill the item name when clicking "Buy Item"
+    // DELETE item from Supabase by ID
+    async function deleteItem(id) {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        alert('Error deleting item: ' + error.message);
+      } else {
+        fetchProducts();
+      }
+    }
+
+    // Quick-fill checkout form
     function quickBuy(itemTitle) {
       document.getElementById('cust-item').value = itemTitle;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // 4. Function to send order details via Formspree Email
+    // Submit Order via Formspree
     function sendOrder() {
       const customer = document.getElementById('cust-name').value;
       const item = document.getElementById('cust-item').value;
@@ -223,39 +261,32 @@
         return;
       }
 
-      // 🔴 REPLACE WITH YOUR ACTUAL FORMSPREE ENDPOINT URL:
-      const targetUrl = "https://formspree.io/f/maewbvzr";
-
-      const orderData = {
-        "Customer Name": customer,
-        "Item Ordered": item,
-        "Delivery Address": address
-      };
+      // REPLACE WITH YOUR ACTUAL FORMSPREE FORM ID WHEN READY:
+      const targetUrl = "https://formspree.io/f/YOUR_FORM_ID_HERE";
 
       if (targetUrl.includes("YOUR_FORM_ID_HERE")) {
-        alert(`Demo Mode Active!\n\nOrder Details:\nCustomer: ${customer}\nItem: ${item}\nAddress: ${address}\n\n(To receive real emails, replace YOUR_FORM_ID_HERE with your Formspree form ID!)`);
+        alert(`Order Placed (Demo Mode)!\n\nCustomer: ${customer}\nItem: ${item}\nAddress: ${address}\n\n(To receive real emails, replace YOUR_FORM_ID_HERE with your Formspree link!)`);
       } else {
         fetch(targetUrl, {
           method: 'POST',
-          headers: { 
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify(orderData)
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({ "Customer Name": customer, "Item Ordered": item, "Delivery Address": address })
         })
-        .then(response => {
-          if (response.ok) {
-            alert(`Order Sent Successfully!\nAn email alert has been sent to the store owner.`);
+        .then(res => {
+          if (res.ok) {
+            alert('Order Sent Successfully!');
             document.getElementById('cust-name').value = '';
             document.getElementById('cust-item').value = '';
             document.getElementById('cust-address').selectedIndex = 0;
           } else {
-            alert('Error sending order. Please check your Formspree URL ID.');
+            alert('Error sending order. Check Formspree URL.');
           }
-        })
-        .catch(err => alert('Error sending order: ' + err));
+        });
       }
     }
+
+    // Load products on initial open
+    fetchProducts();
   </script>
 
 </body>
