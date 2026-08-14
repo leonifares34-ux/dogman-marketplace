@@ -20,32 +20,32 @@
 
   <h1>🐾 Dog Man Marketplace</h1>
 
-  <!-- LOGIN SECTION -->
+  <!-- 1. LOGIN SECTION -->
   <div class="card">
-    <h2>Login / Create Account</h2>
+    <h2>1. Login / Create Account</h2>
     <input type="text" id="username" placeholder="Username (e.g. DogManOfficial)">
     <input type="password" id="password" placeholder="Password">
     <button onclick="login()">Login</button>
     <p id="user-status" style="font-weight: bold; color: #007bff;"></p>
   </div>
 
-  <!-- SELLER LISTING FORM (Only appears when logged in as DogManOfficial) -->
-  <div class="card" id="seller-tools" style="display: none;">
-    <h2>Add New Item</h2>
-    <input type="text" id="item-title" placeholder="Item Name">
+  <!-- 2. ADD NEW ITEM FORM -->
+  <div class="card" id="seller-tools">
+    <h2>2. Add New Item</h2>
+    <input type="text" id="item-title" placeholder="Item Name (e.g. Petey Plush)">
     <input type="number" id="item-price" placeholder="Price ($)">
     <button onclick="addListing()">Post Item</button>
   </div>
 
-  <!-- MARKETPLACE LISTINGS -->
+  <!-- 3. MARKETPLACE LISTINGS -->
   <div class="card">
-    <h2>Available Items</h2>
+    <h2>3. Available Items</h2>
     <div id="listings-list">Loading items...</div>
   </div>
 
-  <!-- PLACE ORDER -->
+  <!-- 4. PLACE ORDER -->
   <div class="card">
-    <h2>Place an Order</h2>
+    <h2>4. Place an Order</h2>
     <input type="text" id="order-listing-id" placeholder="Item ID to buy">
     <input type="text" id="buyer-name" placeholder="Your Name">
     <input type="text" id="fake-address" placeholder="Delivery Address">
@@ -76,15 +76,6 @@
         if (data.success) {
           currentUser = data.user;
           document.getElementById('user-status').innerText = `Logged in as: ${currentUser.username}`;
-          
-          // Show Seller form seamlessly if logged in as DogManOfficial
-          const cleanUser = currentUser.username.replace('@', '').toLowerCase();
-          if (cleanUser === 'dogmanofficial') {
-            document.getElementById('seller-tools').style.display = 'block';
-          } else {
-            document.getElementById('seller-tools').style.display = 'none';
-          }
-
           alert(`Welcome, ${currentUser.username}!`);
           loadListings();
         } else {
@@ -96,6 +87,11 @@
     }
 
     async function addListing() {
+      if (!currentUser) {
+        alert("You must log in above before posting an item!");
+        return;
+      }
+
       const title = document.getElementById('item-title').value;
       const price = document.getElementById('item-price').value;
 
