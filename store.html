@@ -82,6 +82,17 @@
       font-weight: bold;
       cursor: pointer;
     }
+    .delete-btn {
+      background-color: #ff3333;
+      color: white;
+      border: 2px solid black;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .delete-btn:hover { background-color: #cc0000; }
   </style>
 </head>
 <body>
@@ -111,19 +122,20 @@
         container.innerHTML = products.map(item => createCardHtml(item.title, item.price, item.image)).join('');
       });
 
-    // 2. Helper function to make card HTML
+    // 2. Helper function to create product cards with a Delete button
     function createCardHtml(title, price, image) {
       return `
         <div class="card">
           <img src="${image}" alt="${title}">
           <h4>${title.length > 25 ? title.substring(0, 25) + '...' : title}</h4>
           <div class="price">$${price}</div>
-          <button class="buy-btn">Add to Bag</button>
+          <button class="buy-btn">Add to Bag</button><br>
+          <button class="delete-btn" onclick="this.parentElement.remove()">Delete Pack</button>
         </div>
       `;
     }
 
-    // 3. Function to add new seller item to page
+    // 3. Function to add new seller item to the page
     function addItem() {
       const title = document.getElementById('title').value;
       const price = document.getElementById('price').value;
