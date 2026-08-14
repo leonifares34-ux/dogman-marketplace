@@ -133,6 +133,7 @@
   </header>
 
   <div class="container">
+    <!-- SELLER SECTION -->
     <div class="seller-section">
       <h2>⚡ Sell Supa Merch ⚡</h2>
       <input type="text" id="title" placeholder="Item Name (e.g., Supa Buddy Pin)" required><br>
@@ -141,6 +142,7 @@
       <button class="seller-btn" onclick="addItem()">List Item!</button>
     </div>
 
+    <!-- CHECKOUT SECTION -->
     <div class="checkout-section">
       <h2>📦 Order & Choose Address 📦</h2>
       <input type="text" id="cust-name" placeholder="Your Name" required><br>
@@ -157,9 +159,11 @@
     </div>
   </div>
 
+  <!-- PRODUCTS GRID -->
   <div id="product-container" class="grid"></div>
 
   <script>
+    // LOCAL STORAGE ITEM MANAGEMENT
     function getProducts() {
       const data = localStorage.getItem('dogman_products');
       return data ? JSON.parse(data) : [];
@@ -231,6 +235,7 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
+    // FORMSPREE EMAIL ORDER SUBMISSION
     function sendOrder() {
       const customer = document.getElementById('cust-name').value;
       const item = document.getElementById('cust-item').value;
@@ -241,10 +246,34 @@
         return;
       }
 
-      alert(`Order Placed!\nCustomer: ${customer}\nItem: ${item}\nAddress: ${address}`);
-      document.getElementById('cust-name').value = '';
-      document.getElementById('cust-item').value = '';
-      document.getElementById('cust-address').selectedIndex = 0;
+      // 🔴 PASTE YOUR FORMSPREE URL HERE (e.g., "https://formspree.io/f/xyzvqwbz"):
+      const FORMSPREE_URL = "https://formspree.io/f/maewbvzr";
+
+      if (FORMSPREE_URL.includes("YOUR_FORM_ID_HERE")) {
+        alert("Order received in demo mode!\n\nTo send actual emails to your inbox, paste your Formspree link into line 182 of the code.");
+        return;
+      }
+
+      fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          "Customer Name": customer,
+          "Item Ordered": item,
+          "Delivery Address": address
+        })
+      })
+      .then(res => {
+        if (res.ok) {
+          alert('Order sent successfully! Check your email inbox.');
+          document.getElementById('cust-name').value = '';
+          document.getElementById('cust-item').value = '';
+          document.getElementById('cust-address').selectedIndex = 0;
+        } else {
+          alert('Failed to send order. Check your Formspree URL.');
+        }
+      })
+      .catch(err => alert('Network error: ' + err.message));
     }
 
     displayProducts();
