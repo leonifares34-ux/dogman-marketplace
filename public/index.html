@@ -8,38 +8,31 @@
     body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
     h1 { color: #333; text-align: center; }
     .card { background: white; padding: 20px; margin: 15px auto; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 500px; }
-    input, button { margin: 8px 0; padding: 10px; display: block; width: 100%; box-sizing: border-radius: 4px; border: 1px solid #ccc; }
+    input, button { margin: 8px 0; padding: 10px; display: block; width: 100%; box-sizing: border-box; border-radius: 4px; border: 1px solid #ccc; }
     button { background-color: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; }
     button:hover { background-color: #218838; }
-    .password-container { position: relative; }
-    .toggle-btn { position: absolute; right: 10px; top: 12px; background: none; border: none; width: auto; color: #555; cursor: pointer; }
     .listing-item { border-bottom: 1px solid #eee; padding: 10px 0; }
+    .listing-item:last-child { border-bottom: none; }
     .price { color: #28a745; font-weight: bold; }
-    #seller-tools { display: none; background: #e8f4ea; border: 1px solid #28a745; }
   </style>
 </head>
 <body>
 
   <h1>🐾 Dog Man Marketplace</h1>
 
-  <!-- LOGIN / ACCOUNT SECTION -->
-  <div class="card" id="auth-section">
+  <!-- LOGIN SECTION -->
+  <div class="card">
     <h2>Login / Create Account</h2>
     <input type="text" id="username" placeholder="Username (e.g. DogManOfficial)">
-    
-    <div class="password-container">
-      <input type="password" id="password" placeholder="Password">
-      <button type="button" class="toggle-btn" onclick="togglePassword()">👁️</button>
-    </div>
-
+    <input type="password" id="password" placeholder="Password">
     <button onclick="login()">Login</button>
     <p id="user-status" style="font-weight: bold; color: #007bff;"></p>
   </div>
 
-  <!-- SELLER LISTING FORM (Appears for DogManOfficial) -->
-  <div class="card" id="seller-tools">
-    <h2>➕ Add New Item (Seller Only)</h2>
-    <input type="text" id="item-title" placeholder="Item Name (e.g. Supa Buddies Badge)">
+  <!-- SELLER LISTING FORM (Only appears when logged in as DogManOfficial) -->
+  <div class="card" id="seller-tools" style="display: none;">
+    <h2>Add New Item</h2>
+    <input type="text" id="item-title" placeholder="Item Name">
     <input type="number" id="item-price" placeholder="Price ($)">
     <button onclick="addListing()">Post Item</button>
   </div>
@@ -61,11 +54,6 @@
 
   <script>
     let currentUser = null;
-
-    function togglePassword() {
-      const passInput = document.getElementById('password');
-      passInput.type = passInput.type === 'password' ? 'text' : 'password';
-    }
 
     async function login() {
       const usernameInput = document.getElementById('username').value.trim();
@@ -89,8 +77,9 @@
           currentUser = data.user;
           document.getElementById('user-status').innerText = `Logged in as: ${currentUser.username}`;
           
-          // Show Seller form if logged in as DogManOfficial
-          if (currentUser.username.toLowerCase() === 'dogmanofficial') {
+          // Show Seller form seamlessly if logged in as DogManOfficial
+          const cleanUser = currentUser.username.replace('@', '').toLowerCase();
+          if (cleanUser === 'dogmanofficial') {
             document.getElementById('seller-tools').style.display = 'block';
           } else {
             document.getElementById('seller-tools').style.display = 'none';
