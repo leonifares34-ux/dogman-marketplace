@@ -1,4 +1,4 @@
-<!<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -142,20 +142,17 @@
       <button class="seller-btn" onclick="addItem()">List Item!</button>
     </div>
 
-    <!-- CHECKOUT SECTION -->
+    <!-- ORDER SECTION -->
     <div class="checkout-section">
       <h2>📦 Order & Choose Address 📦</h2>
       
-      <!-- NAME DROP-DOWN -->
-      <select id="cust-name" required>
-        <option value="" disabled selected>-- Select Your Name --</option>
-        <option value="George">George</option>
-        <option value="Harold">Harold</option>
-        <option value="Dog Man">Dog Man</option>
-        <option value="Petey">Petey</option>
-      </select><br>
+      <!-- CUSTOMER NAME INPUT -->
+      <input type="text" id="cust-name" placeholder="Your Name" required><br>
 
-      <input type="text" id="cust-item" placeholder="Item Name Buying" required><br>
+      <!-- ITEM SELECTION DROP-DOWN -->
+      <select id="cust-item" required>
+        <option value="" disabled selected>-- Select Item to Order --</option>
+      </select><br>
       
       <!-- ADDRESS DROP-DOWN -->
       <select id="cust-address" required>
@@ -182,9 +179,26 @@
       localStorage.setItem('dogman_products', JSON.stringify(products));
     }
 
+    function updateItemDropdown(products) {
+      const itemSelect = document.getElementById('cust-item');
+      if (products.length === 0) {
+        itemSelect.innerHTML = '<option value="" disabled selected>-- No Items Available --</option>';
+        return;
+      }
+
+      let options = '<option value="" disabled selected>-- Select Item to Order --</option>';
+      products.forEach(item => {
+        options += `<option value="${item.title}">${item.title} ($${item.price})</option>`;
+      });
+      itemSelect.innerHTML = options;
+    }
+
     function displayProducts() {
       const container = document.getElementById('product-container');
       const products = getProducts();
+
+      // Update the Order Tab dropdown menu automatically
+      updateItemDropdown(products);
 
       if (products.length === 0) {
         container.innerHTML = '<p style="color: black;">No items listed yet. Add one above!</p>';
@@ -240,7 +254,8 @@
     }
 
     function quickBuy(itemTitle) {
-      document.getElementById('cust-item').value = itemTitle;
+      const itemSelect = document.getElementById('cust-item');
+      itemSelect.value = itemTitle;
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -250,38 +265,37 @@
       const address = document.getElementById('cust-address').value;
 
       if (!customer || !item || !address) {
-        alert('Please select your name, item, and address!');
+        alert('Please fill in your name, select an item, and select an address!');
         return;
       }
 
       // 🔴 PASTE YOUR FORMSPREE LINK HERE:
       const FORMSPREE_URL = "https://formspree.io/f/maewbvzr";
 
-      if (FORMSPREE_URL.includes("YOUR_FORM_ID_HERE")) {
-        alert("Order received in demo mode!\n\nTo send actual emails to your inbox, paste your Formspree link into line 191 of the code.");
-        return;
-      }
-
-      fetch(FORMSPREE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-          "Customer Name": customer,
-          "Item Ordered": item,
-          "Delivery Address": address
+      if (FORMSPREE_URL.includes("maewbvzr")) {
+        alert(`Order Placed!\n\nCustomer Name: ${customer}\nItem Ordered: ${item}\nDelivery Address: ${address}\n\n(To receive real emails, paste your Formspree link into line 192!)`);
+      } else {
+        fetch(FORMSPREE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            "Customer Name": customer,
+            "Item Ordered": item,
+            "Delivery Address": address
+          })
         })
-      })
-      .then(res => {
-        if (res.ok) {
-          alert('Order sent successfully! Check your email inbox.');
-          document.getElementById('cust-name').selectedIndex = 0;
-          document.getElementById('cust-item').value = '';
-          document.getElementById('cust-address').selectedIndex = 0;
-        } else {
-          alert('Failed to send order. Check your Formspree URL.');
-        }
-      })
-      .catch(err => alert('Network error: ' + err.message));
+        .then(res => {
+          if (res.ok) {
+            alert('Order sent successfully!');
+            document.getElementById('cust-name').value = '';
+            document.getElementById('cust-item').selectedIndex = 0;
+            document.getElementById('cust-address').selectedIndex = 0;
+          } else {
+            alert('Failed to send order. Check your Formspree URL.');
+          }
+        })
+        .catch(err => alert('Network error: ' + err.message));
+      }
     }
 
     displayProducts();
