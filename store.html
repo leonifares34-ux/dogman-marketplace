@@ -2,162 +2,434 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dog Man Marketplace</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexStore | Modern Gear & Goods</title>
   <style>
-    body {
-      font-family: 'Arial Black', Impact, sans-serif;
-      background-color: #ffcc00; /* Dog Man Yellow */
+    /* Global Styles & Variables */
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --bg-dark: #0f172a;
+      --bg-light: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
-    header {
-      background-color: #0088cc; /* Hero Blue */
-      color: white;
-      padding: 20px;
-      text-align: center;
-      border-bottom: 5px solid black;
-    }
-    .seller-section {
-      background-color: #ffffff;
-      border: 4px solid black;
-      box-shadow: 5px 5px 0px black;
-      max-width: 500px;
-      margin: 20px auto;
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-    }
-    .seller-section input {
-      width: 90%;
-      padding: 8px;
-      margin: 6px 0;
-      border: 2px solid black;
-      border-radius: 6px;
-      font-weight: bold;
-    }
-    .seller-btn {
-      background-color: #28a745;
-      color: white;
-      font-size: 1em;
-      border: 3px solid black;
-      padding: 10px 15px;
-      border-radius: 6px;
-      cursor: pointer;
-      box-shadow: 3px 3px 0px black;
-      margin-top: 10px;
-    }
-    .seller-btn:hover { background-color: #218838; }
-    .grid {
+
+    body {
+      background-color: var(--bg-light);
+      color: var(--text-main);
       display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-      padding: 20px;
+      flex-direction: column;
+      min-height: 100vh;
     }
-    .card {
+
+    /* Header & Navigation */
+    header {
+      background: var(--bg-dark);
+      color: white;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: white;
+      text-decoration: none;
+    }
+
+    .brand span { color: var(--primary); }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: white; }
+
+    .cart-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: background 0.2s;
+    }
+
+    .cart-btn:hover { background: var(--primary-hover); }
+
+    .cart-count {
       background: white;
-      border: 4px solid black;
-      border-radius: 12px;
-      padding: 15px;
-      width: 220px;
+      color: var(--primary);
+      border-radius: 50%;
+      padding: 0.1rem 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    /* Hero Banner */
+    .hero {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      color: white;
+      padding: 4rem 2rem;
       text-align: center;
-      box-shadow: 5px 5px 0px black;
     }
-    .card img {
-      max-width: 120px;
-      height: 120px;
-      object-fit: contain;
+
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
     }
-    .price {
-      color: #ff3333; /* Supa Red */
-      font-size: 1.3em;
-      margin: 10px 0;
+
+    .hero h1 {
+      font-size: 2.75rem;
+      margin-bottom: 1rem;
     }
-    .buy-btn {
-      background-color: #0088cc;
+
+    .hero p {
+      color: #94a3b8;
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    .btn-hero {
+      background: var(--primary);
       color: white;
-      border: 2px solid black;
-      padding: 8px 12px;
-      border-radius: 6px;
-      font-weight: bold;
+      padding: 0.8rem 2rem;
+      border-radius: 0.5rem;
+      text-decoration: none;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    /* Product Section */
+    .container {
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 0 2rem;
+      flex: 1;
+    }
+
+    .section-title {
+      font-size: 1.75rem;
+      margin-bottom: 2rem;
+      color: var(--text-main);
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 2rem;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    }
+
+    .product-image {
+      width: 100%;
+      height: 200px;
+      background: #e2e8f0;
+      object-fit: cover;
+    }
+
+    .product-info {
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .product-category {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--primary);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .product-title {
+      font-size: 1.1rem;
+      margin: 0.4rem 0;
+      font-weight: 600;
+    }
+
+    .product-price {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .add-to-cart-btn {
+      margin-top: auto;
+      background: var(--bg-dark);
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .add-to-cart-btn:hover { background: var(--primary); }
+
+    /* Shopping Cart Sidebar Drawer */
+    .cart-drawer {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 380px;
+      height: 100%;
+      background: white;
+      box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+      transition: right 0.3s ease;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cart-drawer.open { right: 0; }
+
+    .cart-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .close-cart {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
       cursor: pointer;
     }
-    .delete-btn {
-      background-color: #ff3333;
-      color: white;
-      border: 2px solid black;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
+
+    .cart-items {
+      padding: 1.5rem;
+      flex: 1;
+      overflow-y: auto;
     }
-    .delete-btn:hover { background-color: #cc0000; }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+
+    .cart-footer {
+      padding: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .checkout-btn {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--bg-dark);
+      color: #94a3b8;
+      padding: 2rem;
+      text-align: center;
+      margin-top: auto;
+    }
+
+    @media (max-width: 640px) {
+      .cart-drawer { width: 100%; right: -100%; }
+      .hero h1 { font-size: 2rem; }
+    }
   </style>
 </head>
 <body>
 
+  <!-- Navigation -->
   <header>
-    <h1>🐶 DOG MAN MARKETPLACE 🚨</h1>
+    <nav class="navbar">
+      <a href="#" class="brand">Apex<span>Store</span></a>
+      <ul class="nav-links">
+        <li><a href="#products">Shop</a></li>
+        <li><a href="#">Categories</a></li>
+        <li><a href="#">About</a></li>
+      </ul>
+      <button class="cart-btn" onclick="toggleCart()">
+        Cart <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </nav>
   </header>
 
-  <!-- SELLER ADD ITEM SECTION -->
-  <div class="seller-section">
-    <h2>⚡ Sell Supa Merch ⚡</h2>
-    <input type="text" id="title" placeholder="Item Name (e.g., Supa Buddy Pin)" required><br>
-    <input type="number" id="price" placeholder="Price ($)" step="0.01" required><br>
-    <input type="url" id="image" placeholder="Image URL (http://...)" required><br>
-    <button class="seller-btn" onclick="addItem()">List Item for Sale!</button>
-  </div>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Upgrade Your Daily Gear</h1>
+      <p>Discover minimal, high-performance electronics and accessories designed for modern workflows.</p>
+      <a href="#products" class="btn-hero">Explore Collection</a>
+    </div>
+  </section>
 
-  <!-- MARKETPLACE PRODUCTS GRID -->
-  <div id="product-container" class="grid">Loading Supa Products...</div>
+  <!-- Main Catalog -->
+  <main class="container" id="products">
+    <h2 class="section-title">Featured Products</h2>
+    <div class="product-grid" id="productGrid">
+      <!-- Products dynamically injected via JavaScript -->
+    </div>
+  </main>
+
+  <!-- Cart Drawer -->
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+      <h2>Your Cart</h2>
+      <button class="close-cart" onclick="toggleCart()">&times;</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <p>Your cart is empty.</p>
+    </div>
+    <div class="cart-footer">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+        <strong>Total:</strong>
+        <span id="cartTotal">$0.00</span>
+      </div>
+      <button class="checkout-btn" onclick="alert('Proceeding to checkout!')">Checkout</button>
+    </div>
+  </aside>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2026 ApexStore Inc. All rights reserved.</p>
+  </footer>
 
   <script>
-    // 1. Fetch initial products from FakeStoreAPI
-    fetch('https://fakestoreapi.com/products?limit=6')
-      .then(res => res.json())
-      .then(products => {
-        const container = document.getElementById('product-container');
-        container.innerHTML = products.map(item => createCardHtml(item.title, item.price, item.image)).join('');
-      });
+    // Sample Data
+    const products = [
+      { id: 1, name: "Wireless ANC Headphones", category: "Audio", price: 199.99, image: "https://via.placeholder.com/300x200" },
+      { id: 2, name: "Mechanical Keyboard", category: "Peripherals", price: 129.50, image: "https://via.placeholder.com/300x200" },
+      { id: 3, name: "Ergonomic Desk Mat", category: "Accessories", price: 34.00, image: "https://via.placeholder.com/300x200" },
+      { id: 4, name: "4K USB-C Monitor", category: "Displays", price: 449.99, image: "https://via.placeholder.com/300x200" }
+    ];
 
-    // 2. Helper function to create product cards with a Delete button
-    function createCardHtml(title, price, image) {
-      return `
-        <div class="card">
-          <img src="${image}" alt="${title}">
-          <h4>${title.length > 25 ? title.substring(0, 25) + '...' : title}</h4>
-          <div class="price">$${price}</div>
-          <button class="buy-btn">Add to Bag</button><br>
-          <button class="delete-btn" onclick="this.parentElement.remove()">Delete Pack</button>
-        </div>
-      `;
+    let cart = [];
+
+    // Render Products
+    function renderProducts() {
+      const grid = document.getElementById('productGrid');
+      grid.innerHTML = products.map(p => `
+        <article class="product-card">
+          <img src="${p.image}" alt="${p.name}" class="product-image">
+          <div class="product-info">
+            <span class="product-category">${p.category}</span>
+            <h3 class="product-title">${p.name}</h3>
+            <div class="product-price">$${p.price.toFixed(2)}</div>
+            <button class="add-to-cart-btn" onclick="addToCart(${p.id})">Add to Cart</button>
+          </div>
+        </article>
+      `).join('');
     }
 
-    // 3. Function to add new seller item to the page
-    function addItem() {
-      const title = document.getElementById('title').value;
-      const price = document.getElementById('price').value;
-      const image = document.getElementById('image').value;
+    // Add to Cart
+    function addToCart(productId) {
+      const product = products.find(p => p.id === productId);
+      const existing = cart.find(item => item.id === productId);
 
-      if (!title || !price || !image) {
-        alert('Please fill in all fields!');
+      if (existing) {
+        existing.quantity += 1;
+      } else {
+        cart.push({ ...product, quantity: 1 });
+      }
+
+      updateCartUI();
+    }
+
+    // Update UI Elements
+    function updateCartUI() {
+      const cartItems = document.getElementById('cartItems');
+      const cartCount = document.getElementById('cartCount');
+      const cartTotal = document.getElementById('cartTotal');
+
+      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+      cartCount.textContent = totalItems;
+
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<p>Your cart is empty.</p>';
+        cartTotal.textContent = '$0.00';
         return;
       }
 
-      const container = document.getElementById('product-container');
-      const newCardHtml = createCardHtml(title, price, image);
-      
-      // Add new card directly to the top of the grid
-      container.insertAdjacentHTML('afterbegin', newCardHtml);
+      cartItems.innerHTML = cart.map(item => `
+        <div class="cart-item">
+          <div>
+            <strong>${item.name}</strong><br>
+            <small>$${item.price.toFixed(2)} x ${item.quantity}</small>
+          </div>
+          <div>$${(item.price * item.quantity).toFixed(2)}</div>
+        </div>
+      `).join('');
 
-      // Clear input fields
-      document.getElementById('title').value = '';
-      document.getElementById('price').value = '';
-      document.getElementById('image').value = '';
+      const totalSum = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      cartTotal.textContent = `$${totalSum.toFixed(2)}`;
     }
-  </script>
 
+    // Toggle Sidebar
+    function toggleCart() {
+      document.getElementById('cartDrawer').classList.toggle('open');
+    }
+
+    // Init
+    renderProducts();
+  </script>
 </body>
 </html>
