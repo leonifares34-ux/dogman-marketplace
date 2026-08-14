@@ -6,17 +6,47 @@
   <style>
     body {
       font-family: 'Arial Black', Impact, sans-serif;
-      background-color: #ffcc00; /* Vibrant Yellow background */
+      background-color: #ffcc00; /* Dog Man Yellow */
       margin: 0;
       padding: 0;
     }
     header {
-      background-color: #0088cc; /* Hero Blue header */
+      background-color: #0088cc; /* Hero Blue */
       color: white;
       padding: 20px;
       text-align: center;
       border-bottom: 5px solid black;
     }
+    .seller-section {
+      background-color: #ffffff;
+      border: 4px solid black;
+      box-shadow: 5px 5px 0px black;
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+    }
+    .seller-section input {
+      width: 90%;
+      padding: 8px;
+      margin: 6px 0;
+      border: 2px solid black;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+    .seller-btn {
+      background-color: #28a745;
+      color: white;
+      font-size: 1em;
+      border: 3px solid black;
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0px black;
+      margin-top: 10px;
+    }
+    .seller-btn:hover { background-color: #218838; }
     .grid {
       display: flex;
       flex-wrap: wrap;
@@ -31,7 +61,7 @@
       padding: 15px;
       width: 220px;
       text-align: center;
-      box-shadow: 5px 5px 0px black; /* Comic book shadow effect */
+      box-shadow: 5px 5px 0px black;
     }
     .card img {
       max-width: 120px;
@@ -39,7 +69,7 @@
       object-fit: contain;
     }
     .price {
-      color: #ff3333; /* Supa Red price text */
+      color: #ff3333; /* Supa Red */
       font-size: 1.3em;
       margin: 10px 0;
     }
@@ -60,22 +90,61 @@
     <h1>🐶 DOG MAN MARKETPLACE 🚨</h1>
   </header>
 
+  <!-- SELLER ADD ITEM SECTION -->
+  <div class="seller-section">
+    <h2>⚡ Sell Supa Merch ⚡</h2>
+    <input type="text" id="title" placeholder="Item Name (e.g., Supa Buddy Pin)" required><br>
+    <input type="number" id="price" placeholder="Price ($)" step="0.01" required><br>
+    <input type="url" id="image" placeholder="Image URL (http://...)" required><br>
+    <button class="seller-btn" onclick="addItem()">List Item for Sale!</button>
+  </div>
+
+  <!-- MARKETPLACE PRODUCTS GRID -->
   <div id="product-container" class="grid">Loading Supa Products...</div>
 
   <script>
-    fetch('https://fakestoreapi.com/products?limit=8')
+    // 1. Fetch initial products from FakeStoreAPI
+    fetch('https://fakestoreapi.com/products?limit=6')
       .then(res => res.json())
       .then(products => {
         const container = document.getElementById('product-container');
-        container.innerHTML = products.map(item => `
-          <div class="card">
-            <img src="${item.image}" alt="${item.title}">
-            <h4>${item.title.substring(0, 25)}...</h4>
-            <div class="price">$${item.price}</div>
-            <button class="buy-btn">Add to Bag</button>
-          </div>
-        `).join('');
+        container.innerHTML = products.map(item => createCardHtml(item.title, item.price, item.image)).join('');
       });
+
+    // 2. Helper function to make card HTML
+    function createCardHtml(title, price, image) {
+      return `
+        <div class="card">
+          <img src="${image}" alt="${title}">
+          <h4>${title.length > 25 ? title.substring(0, 25) + '...' : title}</h4>
+          <div class="price">$${price}</div>
+          <button class="buy-btn">Add to Bag</button>
+        </div>
+      `;
+    }
+
+    // 3. Function to add new seller item to page
+    function addItem() {
+      const title = document.getElementById('title').value;
+      const price = document.getElementById('price').value;
+      const image = document.getElementById('image').value;
+
+      if (!title || !price || !image) {
+        alert('Please fill in all fields!');
+        return;
+      }
+
+      const container = document.getElementById('product-container');
+      const newCardHtml = createCardHtml(title, price, image);
+      
+      // Add new card directly to the top of the grid
+      container.insertAdjacentHTML('afterbegin', newCardHtml);
+
+      // Clear input fields
+      document.getElementById('title').value = '';
+      document.getElementById('price').value = '';
+      document.getElementById('image').value = '';
+    }
   </script>
 
 </body>
