@@ -129,12 +129,12 @@
 <body>
 
   <header>
-    <h1>Welcome to the Dog Man Store</h1>
+    <h1>🐶 DOG MAN MARKETPLACE 🚨</h1>
   </header>
 
   <div class="container">
     <div class="seller-section">
-      <h2>List Items</h2>
+      <h2>⚡ Sell Supa Merch ⚡</h2>
       <input type="text" id="title" placeholder="Item Name (e.g., Supa Buddy Pin)" required><br>
       <input type="number" id="price" placeholder="Price ($)" step="0.01" required><br>
       <input type="url" id="image" placeholder="Image URL (http://...)" required><br>
@@ -150,3 +150,155 @@
         <option value="Denise">Denise</option>
         <option value="Josh">Josh</option>
         <option value="Luna">Luna</option>
+      </select><br>
+
+      <select id="cust-item" required>
+        <option value="" disabled selected>-- Select Item to Order --</option>
+      </select><br>
+
+      <input type="number" id="cust-qty" placeholder="Quantity (e.g., 2)" min="1" value="1" required><br>
+      
+      <select id="cust-address" required>
+        <option value="" disabled selected>-- Select Delivery Address --</option>
+        <option value="Bomboklat street">Bomboklat street</option>
+        <option value="Factory street">Factory street</option>
+        <option value="Oral B Street">Oral B Street</option>
+      </select><br>
+
+      <button class="order-btn" onclick="sendOrder()">Submit Order!</button>
+    </div>
+  </div>
+
+  <div id="product-container" class="grid"></div>
+
+  <script>
+    function getProducts() {
+      const data = localStorage.getItem('dogman_products');
+      return data ? JSON.parse(data) : [];
+    }
+
+    function saveProducts(products) {
+      localStorage.setItem('dogman_products', JSON.stringify(products));
+    }
+
+    function updateItemDropdown(products) {
+      const itemSelect = document.getElementById('cust-item');
+      if (products.length === 0) {
+        itemSelect.innerHTML = '<option value="" disabled selected>-- No Items Available --</option>';
+        return;
+      }
+
+      let options = '<option value="" disabled selected>-- Select Item to Order --</option>';
+      products.forEach(item => {
+        options += `<option value="${item.title}">${item.title} ($${item.price})</option>`;
+      });
+      itemSelect.innerHTML = options;
+    }
+
+    function displayProducts() {
+      const container = document.getElementById('product-container');
+      const products = getProducts();
+
+      updateItemDropdown(products);
+
+      if (products.length === 0) {
+        container.innerHTML = '<p style="color: black;">No items listed yet. Add one above!</p>';
+        return;
+      }
+
+      container.innerHTML = products.map(item => {
+        const safeTitle = item.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        return `
+          <div class="card">
+            <img src="${item.image}" alt="${safeTitle}">
+            <h4>${safeTitle.length > 25 ? safeTitle.substring(0, 25) + '...' : safeTitle}</h4>
+            <div class="price">$${item.price}</div>
+            <button class="buy-btn" onclick="quickBuy('${safeTitle}')">Buy Item</button><br>
+            <button class="delete-btn" onclick="deleteItem(${item.id})">Delete Item</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function addItem() {
+      const title = document.getElementById('title').value;
+      const price = document.getElementById('price').value;
+      const image = document.getElementById('image').value;
+
+      if (!title || !price || !image) {
+        alert('Please fill in all seller fields!');
+        return;
+      }
+
+      const products = getProducts();
+      products.unshift({
+        id: Date.now(),
+        title: title,
+        price: price,
+        image: image
+      });
+
+      saveProducts(products);
+
+      document.getElementById('title').value = '';
+      document.getElementById('price').value = '';
+      document.getElementById('image').value = '';
+
+      displayProducts();
+    }
+
+    function deleteItem(id) {
+      let products = getProducts();
+      products = products.filter(item => item.id !== id);
+      saveProducts(products);
+      displayProducts();
+    }
+
+    function quickBuy(itemTitle) {
+      const itemSelect = document.getElementById('cust-item');
+      itemSelect.value = itemTitle;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function sendOrder() {
+      const customer = document.getElementById('cust-name').value;
+      const item = document.getElementById('cust-item').value;
+      const quantity = document.getElementById('cust-qty').value;
+      const address = document.getElementById('cust-address').value;
+
+      if (!customer || !item || !quantity || !address) {
+        alert('Please select a name, item, quantity, and address!');
+        return;
+      }
+
+      const FORMSPREE_URL = "https://formspree.io/f/maewbvzr";
+
+      fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          "Customer Name": customer,
+          "Item Ordered": item,
+          "Quantity": quantity,
+          "Delivery Address": address
+        })
+      })
+      .then(res => {
+        if (res.ok) {
+          alert('Order sent successfully! Check your email inbox.');
+          document.getElementById('cust-name').selectedIndex = 0;
+          document.getElementById('cust-item').selectedIndex = 0;
+          document.getElementById('cust-qty').value = '1';
+          document.getElementById('cust-address').selectedIndex = 0;
+        } else {
+          alert('Failed to send order. Check your Formspree URL.');
+        }
+      })
+      .catch(err => alert('Network error: ' + err.message));
+    }
+
+    displayProducts();
+  </script>
+
+</body>
+</html>
