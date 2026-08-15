@@ -168,7 +168,11 @@
       <h2>⚡ Sell Supa Merch ⚡</h2>
       <input type="text" id="title" placeholder="Item Name (e.g., Supa Buddy Pin)" required><br>
       <input type="number" id="price" placeholder="Price ($)" step="0.01" required><br>
-      <input type="url" id="image" placeholder="Image URL (http://...)" required><br>
+      
+      <!-- FILE UPLOAD INPUT (Mobile friendly) -->
+      <label style="font-size: 0.85em; font-weight: bold; display: block; margin-top: 5px;">Upload Product Image:</label>
+      <input type="file" id="image-file" accept="image/*" required><br>
+      
       <button class="seller-btn" onclick="addItem()">List Item!</button>
     </div>
 
@@ -259,28 +263,37 @@
     function addItem() {
       const title = document.getElementById('title').value;
       const price = document.getElementById('price').value;
-      const image = document.getElementById('image').value;
+      const fileInput = document.getElementById('image-file');
 
-      if (!title || !price || !image) {
-        alert('Please fill in all seller fields!');
+      if (!title || !price || fileInput.files.length === 0) {
+        alert('Please fill in all seller fields and choose an image!');
         return;
       }
 
-      const products = getProducts();
-      products.unshift({
-        id: Date.now(),
-        title: title,
-        price: price,
-        image: image
-      });
+      const file = fileInput.files[0];
+      const reader = new FileReader();
 
-      saveProducts(products);
+      reader.onload = function(e) {
+        const imageDataUrl = e.target.result;
 
-      document.getElementById('title').value = '';
-      document.getElementById('price').value = '';
-      document.getElementById('image').value = '';
+        const products = getProducts();
+        products.unshift({
+          id: Date.now(),
+          title: title,
+          price: price,
+          image: imageDataUrl
+        });
 
-      displayProducts();
+        saveProducts(products);
+
+        document.getElementById('title').value = '';
+        document.getElementById('price').value = '';
+        fileInput.value = '';
+
+        displayProducts();
+      };
+
+      reader.readAsDataURL(file);
     }
 
     function deleteItem(id) {
@@ -304,7 +317,6 @@
       const customer = document.getElementById('cust-name').value;
       const address = document.getElementById('cust-address').value;
 
-      // Get all checked items
       const selectedBoxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked');
       const selectedItems = Array.from(selectedBoxes).map(cb => cb.value);
 
