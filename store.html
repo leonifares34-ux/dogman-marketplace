@@ -52,6 +52,36 @@
       font-family: inherit;
       box-sizing: border-box;
     }
+    .item-checkbox-container {
+      background: white;
+      color: black;
+      border: 3px solid black;
+      border-radius: 6px;
+      padding: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+      text-align: left;
+      margin: 8px auto;
+      width: 90%;
+      box-sizing: border-box;
+    }
+    .item-checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .item-checkbox-row input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      transform: scale(1.3);
+      cursor: pointer;
+    }
+    .item-checkbox-row label {
+      font-weight: bold;
+      font-size: 0.9em;
+      cursor: pointer;
+    }
     .seller-btn {
       background-color: #28a745;
       color: white;
@@ -133,6 +163,7 @@
   </header>
 
   <div class="container">
+    <!-- SELLER SECTION -->
     <div class="seller-section">
       <h2>⚡ Sell Supa Merch ⚡</h2>
       <input type="text" id="title" placeholder="Item Name (e.g., Supa Buddy Pin)" required><br>
@@ -141,9 +172,11 @@
       <button class="seller-btn" onclick="addItem()">List Item!</button>
     </div>
 
+    <!-- ORDER SECTION -->
     <div class="checkout-section">
       <h2>📦 Order & Choose Address 📦</h2>
       
+      <!-- NAME DROP-DOWN -->
       <select id="cust-name" required>
         <option value="" disabled selected>-- Select Your Name --</option>
         <option value="Arthur">Arthur</option>
@@ -152,12 +185,13 @@
         <option value="Luna">Luna</option>
       </select><br>
 
-      <select id="cust-item" required>
-        <option value="" disabled selected>-- Select Item to Order --</option>
-      </select><br>
+      <!-- MULTI-SELECT CHECKBOX CONTAINER -->
+      <div style="font-weight: bold; margin-top: 5px;">Select Items to Order:</div>
+      <div id="item-checkboxes" class="item-checkbox-container">
+        <p style="margin: 0; color: gray;">No items listed yet.</p>
+      </div>
 
-      <input type="number" id="cust-qty" placeholder="Quantity (e.g., 2)" min="1" value="1" required><br>
-      
+      <!-- ADDRESS DROP-DOWN -->
       <select id="cust-address" required>
         <option value="" disabled selected>-- Select Delivery Address --</option>
         <option value="Bomboklat street">Bomboklat street</option>
@@ -169,6 +203,7 @@
     </div>
   </div>
 
+  <!-- PRODUCTS GRID -->
   <div id="product-container" class="grid"></div>
 
   <script>
@@ -181,25 +216,26 @@
       localStorage.setItem('dogman_products', JSON.stringify(products));
     }
 
-    function updateItemDropdown(products) {
-      const itemSelect = document.getElementById('cust-item');
+    function updateItemCheckboxes(products) {
+      const container = document.getElementById('item-checkboxes');
       if (products.length === 0) {
-        itemSelect.innerHTML = '<option value="" disabled selected>-- No Items Available --</option>';
+        container.innerHTML = '<p style="margin: 0; color: gray;">No items available.</p>';
         return;
       }
 
-      let options = '<option value="" disabled selected>-- Select Item to Order --</option>';
-      products.forEach(item => {
-        options += `<option value="${item.title}">${item.title} ($${item.price})</option>`;
-      });
-      itemSelect.innerHTML = options;
+      container.innerHTML = products.map((item, index) => `
+        <div class="item-checkbox-row">
+          <input type="checkbox" id="item-check-${index}" value="${item.title}">
+          <label for="item-check-${index}">${item.title} ($${item.price})</label>
+        </div>
+      `).join('');
     }
 
     function displayProducts() {
       const container = document.getElementById('product-container');
       const products = getProducts();
 
-      updateItemDropdown(products);
+      updateItemCheckboxes(products);
 
       if (products.length === 0) {
         container.innerHTML = '<p style="color: black;">No items listed yet. Add one above!</p>';
@@ -255,19 +291,25 @@
     }
 
     function quickBuy(itemTitle) {
-      const itemSelect = document.getElementById('cust-item');
-      itemSelect.value = itemTitle;
+      const checkboxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]');
+      checkboxes.forEach(cb => {
+        if (cb.value === itemTitle) {
+          cb.checked = true;
+        }
+      });
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function sendOrder() {
       const customer = document.getElementById('cust-name').value;
-      const item = document.getElementById('cust-item').value;
-      const quantity = document.getElementById('cust-qty').value;
       const address = document.getElementById('cust-address').value;
 
-      if (!customer || !item || !quantity || !address) {
-        alert('Please select a name, item, quantity, and address!');
+      // Get all checked items
+      const selectedBoxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked');
+      const selectedItems = Array.from(selectedBoxes).map(cb => cb.value);
+
+      if (!customer || selectedItems.length === 0 || !address) {
+        alert('Please select a name, at least ONE item, and an address!');
         return;
       }
 
@@ -278,18 +320,17 @@
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
           "Customer Name": customer,
-          "Item Ordered": item,
-          "Quantity": quantity,
+          "Items Ordered": selectedItems.join(', '),
+          "Total Items": selectedItems.length,
           "Delivery Address": address
         })
       })
       .then(res => {
         if (res.ok) {
-          alert('Order sent successfully! Check your email inbox.');
+          alert(`Order sent successfully! (${selectedItems.length} items ordered)`);
           document.getElementById('cust-name').selectedIndex = 0;
-          document.getElementById('cust-item').selectedIndex = 0;
-          document.getElementById('cust-qty').value = '1';
           document.getElementById('cust-address').selectedIndex = 0;
+          document.querySelectorAll('#item-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
         } else {
           alert('Failed to send order. Check your Formspree URL.');
         }
