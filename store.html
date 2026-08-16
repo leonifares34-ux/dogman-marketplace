@@ -607,41 +607,46 @@
     const PUSHER_KEY = "3651c3c833375dea577d";
     const PUSHER_CLUSTER = "eu";
 
-    const pusher = new Pusher(PUSHER_KEY, {
-      cluster: PUSHER_CLUSTER
-    });
+    let pusher, channel;
+    try {
+      pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
+      channel = pusher.subscribe('audio-room');
+    } catch (e) {
+      console.error("Pusher init error:", e);
+    }
 
-    const channel = pusher.subscribe('audio-room');
     const audio = document.getElementById('sync-audio');
     const audioSelect = document.getElementById('audio-select');
     const playBtn = document.getElementById('audio-play-btn');
     const statusText = document.getElementById('audio-status');
 
-    pusher.connection.bind('connected', () => {
-      statusText.innerText = "Connected! Tap Play to sync.";
-    });
+    if (pusher) {
+      pusher.connection.bind('connected', () => {
+        statusText.innerText = "Connected! Tap Play to sync.";
+      });
 
-    channel.bind('client-audio-control', function(data) {
-      if (data.track && audioSelect.value !== data.track) {
-        audioSelect.value = data.track;
-        audio.src = data.track;
-      }
+      channel.bind('client-audio-control', function(data) {
+        if (data.track && audioSelect.value !== data.track) {
+          audioSelect.value = data.track;
+          audio.src = data.track;
+        }
 
-      audio.currentTime = data.time;
+        audio.currentTime = data.time;
 
-      if (data.action === 'play') {
-        audio.play().then(() => {
-          playBtn.innerText = "⏸️ Pause for Everyone";
-          statusText.innerText = "Playing in sync!";
-        }).catch(() => {
-          statusText.innerText = "⚠️ Tap anywhere on screen to allow sound!";
-        });
-      } else if (data.action === 'pause') {
-        audio.pause();
-        playBtn.innerText = "▶️ Play for Everyone";
-        statusText.innerText = "Paused remotely.";
-      }
-    });
+        if (data.action === 'play') {
+          audio.play().then(() => {
+            playBtn.innerText = "⏸️ Pause for Everyone";
+            statusText.innerText = "Playing in sync!";
+          }).catch(() => {
+            statusText.innerText = "⚠️ Tap anywhere on screen to allow sound!";
+          });
+        } else if (data.action === 'pause') {
+          audio.pause();
+          playBtn.innerText = "▶️ Play for Everyone";
+          statusText.innerText = "Paused remotely.";
+        }
+      });
+    }
 
     function changeTrackBroadcast() {
       audio.src = audioSelect.value;
@@ -650,11 +655,13 @@
       playBtn.innerText = "▶️ Play for Everyone";
       statusText.innerText = "Track changed. Ready to sync.";
 
-      channel.trigger('client-audio-control', {
-        action: 'pause',
-        time: 0,
-        track: audioSelect.value
-      });
+      if (channel) {
+        channel.trigger('client-audio-control', {
+          action: 'pause',
+          time: 0,
+          track: audioSelect.value
+        });
+      }
     }
 
     function toggleAudio() {
@@ -663,21 +670,25 @@
         playBtn.innerText = "⏸️ Pause for Everyone";
         statusText.innerText = "Broadcasting Play...";
 
-        channel.trigger('client-audio-control', {
-          action: 'play',
-          time: audio.currentTime,
-          track: audioSelect.value
-        });
+        if (channel) {
+          channel.trigger('client-audio-control', {
+            action: 'play',
+            time: audio.currentTime,
+            track: audioSelect.value
+          });
+        }
       } else {
         audio.pause();
         playBtn.innerText = "▶️ Play for Everyone";
         statusText.innerText = "Broadcasting Pause...";
 
-        channel.trigger('client-audio-control', {
-          action: 'pause',
-          time: audio.currentTime,
-          track: audioSelect.value
-        });
+        if (channel) {
+          channel.trigger('client-audio-control', {
+            action: 'pause',
+            time: audio.currentTime,
+            track: audioSelect.value
+          });
+        }
       }
     }
 
@@ -693,11 +704,13 @@
         playBtn.innerText = "⏸️ Pause for Everyone";
         statusText.innerText = "Playing next track!";
 
-        channel.trigger('client-audio-control', {
-          action: 'play',
-          time: 0,
-          track: audioSelect.value
-        });
+        if (channel) {
+          channel.trigger('client-audio-control', {
+            action: 'play',
+            time: 0,
+            track: audioSelect.value
+          });
+        }
       }).catch(() => {
         statusText.innerText = "⚠️ Tap anywhere on screen to allow sound!";
       });
@@ -1010,9 +1023,10 @@
     }
 
     window.onload = function() {
-      if (!localStorage.getItem('dogman_ids_fixed_v3')) {
+      // Force clean any broken local storage cache
+      if (!localStorage.getItem('dogman_clean_reset_v4')) {
         localStorage.removeItem('dogman_products');
-        localStorage.setItem('dogman_ids_fixed_v3', 'true');
+        localStorage.setItem('dogman_clean_reset_v4', 'true');
       }
       displayProducts();
     };
