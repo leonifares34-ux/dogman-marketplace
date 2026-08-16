@@ -93,10 +93,10 @@
       justify-content: center;
       margin: 10px auto;
       width: 95%;
-      max-height: 250px;
+      max-height: 220px;
       overflow-y: auto;
       padding: 5px;
-      background: rgba(0, 0, 0, 0.1);
+      background: rgba(0, 0, 0, 0.15);
       border: 3px solid black;
       border-radius: 8px;
       box-sizing: border-box;
@@ -107,7 +107,7 @@
       border: 3px solid black;
       border-radius: 8px;
       padding: 6px;
-      width: 110px;
+      width: 105px;
       cursor: pointer;
       text-align: center;
       box-shadow: 3px 3px 0px black;
@@ -122,14 +122,14 @@
     }
     .address-card img {
       width: 100%;
-      height: 60px;
+      height: 55px;
       object-fit: cover;
       border: 2px solid black;
       border-radius: 4px;
-      margin-bottom: 5px;
+      margin-bottom: 4px;
     }
     .address-card span {
-      font-size: 0.75em;
+      font-size: 0.7em;
       display: block;
       line-height: 1.1em;
       font-weight: bold;
@@ -560,7 +560,6 @@
         return;
       }
 
-      // Preserve currently checked items during DOM re-render to prevent flickering/unchecking bug
       const checkedTitles = Array.from(document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked'))
                                  .map(cb => cb.value);
 
