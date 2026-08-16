@@ -1,36 +1,1050 @@
-// Render function ensuring unique IDs/indices are passed to actions
-function renderItems(itemsToRender) {
-    const grid = document.getElementById('itemGrid');
-    grid.innerHTML = '';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dog Man Marketplace</title>
+  <!-- Free Pusher SDK -->
+  <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #ffcc00;
+      --card-bg: #ffffff;
+      --text-color: #000000;
+      --header-bg: #0088cc;
+      --checkout-bg: #0088cc;
+      --element-border: #000000;
+      --box-shadow: 5px 5px 0px #000000;
+      --small-shadow: 3px 3px 0px #000000;
+    }
+    body.dark-mode {
+      --bg-color: #121212;
+      --card-bg: #2d2d2d;
+      --text-color: #e0e0e0;
+      --header-bg: #1a1a1a;
+      --checkout-bg: #1a1a1a;
+      --element-border: #00d2ff;
+      --box-shadow: 5px 5px 0px #ffe600, 0px 0px 15px rgba(0, 210, 255, 0.6);
+      --small-shadow: 3px 3px 0px #ffe600, 0px 0px 8px rgba(0, 210, 255, 0.4);
+    }
 
-    itemsToRender.forEach((item, index) => {
-        // Fallback to index or a unique timestamp if item.id isn't defined
-        const uniqueId = item.id || `item_${index}_${Date.now()}`;
-        
-        const card = document.createElement('div');
-        card.className = 'item-card';
-        card.innerHTML = `
-            <div class="card-top-bar">
-                <input type="checkbox" class="item-checkbox" data-id="${uniqueId}" onChange="toggleSelectItem('${uniqueId}')">
-                <button class="delete-btn" onclick="deleteItem('${uniqueId}')">🗑️ Delete</button>
-            </div>
-            <img src="${item.image || 'default.png'}" alt="${item.name}">
-            <h3>${item.name}</h3>
-            <p class="price">$${item.price.toFixed(2)}</p>
-            <button class="buy-btn" onclick="buyItem('${uniqueId}')">Buy Item</button>
-        `;
-        grid.appendChild(card);
-    });
-}
+    body {
+      font-family: 'Arial Black', Impact, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    header {
+      background-color: var(--header-bg);
+      color: #2d2d2d;
+      padding: 20px;
+      text-align: center;
+      border-bottom: 5px solid var(--element-border);
+      position: relative;
+      box-shadow: 0px 0px 20px rgba(0, 210, 255, 0.3);
+      transition: border-color 0.3s, background-color 0.3s;
+    }
+    body.dark-mode header {
+      color: #ffe600;
+    }
+    .theme-toggle-btn {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background: var(--card-bg);
+      color: var(--text-color);
+      border: 3px solid var(--element-border);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: var(--small-shadow);
+      font-family: inherit;
+      transition: all 0.3s;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px auto;
+      max-width: 1100px;
+      padding: 0 10px;
+    }
+    .seller-section, .checkout-section {
+      background-color: var(--card-bg);
+      border: 4px solid var(--element-border);
+      box-shadow: var(--box-shadow);
+      flex: 1;
+      min-width: 300px;
+      max-width: 480px;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      box-sizing: border-box;
+      transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+    }
+    .checkout-section {
+      background-color: var(--checkout-bg);
+      color: var(--text-color);
+    }
+    body.dark-mode .checkout-section {
+      color: #ffe600;
+    }
+    .seller-section input, .checkout-section input, .checkout-section select, #audio-select {
+      width: 90%;
+      padding: 10px;
+      margin: 6px 0;
+      border: 3px solid var(--element-border);
+      border-radius: 6px;
+      font-weight: bold;
+      font-family: inherit;
+      box-sizing: border-box;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      transition: all 0.3s;
+    }
+    .item-checkbox-container {
+      background: var(--card-bg);
+      color: var(--text-color);
+      border: 3px solid var(--element-border);
+      border-radius: 6px;
+      padding: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+      text-align: left;
+      margin: 8px auto;
+      width: 90%;
+      box-sizing: border-box;
+      transition: all 0.3s;
+    }
+    .item-checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .item-checkbox-row input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+      transform: scale(1.3);
+      cursor: pointer;
+    }
+    .item-checkbox-row label {
+      font-weight: bold;
+      font-size: 0.9em;
+      cursor: pointer;
+    }
 
-// Delete function targeting the unique identifier
-function deleteItem(targetId) {
-    // Filter out the exact item matching this unique ID/index reference
-    allItems = allItems.filter((item, index) => {
-        const uniqueId = item.id || `item_${index}_${item.timestamp || ''}`;
-        return uniqueId !== targetId && index.toString() !== targetId;
-    });
+    /* Scrollable Address Card Grid */
+    .address-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 10px auto;
+      width: 95%;
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 5px;
+      background: rgba(0, 0, 0, 0.15);
+      border: 3px solid var(--element-border);
+      border-radius: 8px;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+    body.dark-mode .address-grid {
+      background: rgba(0, 210, 255, 0.08);
+    }
+    .address-card {
+      background: var(--card-bg);
+      color: var(--text-color);
+      border: 3px solid var(--element-border);
+      border-radius: 8px;
+      padding: 6px;
+      width: 105px;
+      cursor: pointer;
+      text-align: center;
+      box-shadow: var(--small-shadow);
+      transition: transform 0.1s, border-color 0.3s, background-color 0.3s;
+      box-sizing: border-box;
+    }
+    .address-card:hover {
+      transform: translateY(-2px);
+    }
+    .address-card input[type="radio"] {
+      display: none;
+    }
+    .address-card img {
+      width: 100%;
+      height: 55px;
+      object-fit: cover;
+      border: 2px solid var(--element-border);
+      border-radius: 4px;
+      margin-bottom: 4px;
+      transition: border-color 0.3s;
+    }
+    .address-card span {
+      font-size: 0.7em;
+      display: block;
+      line-height: 1.1em;
+      font-weight: bold;
+    }
+    .address-card.selected {
+      border: 4px solid #ffe600;
+      background-color: #383838;
+      color: #ffe600;
+    }
+
+    .seller-btn {
+      background-color: #28a745;
+      color: #2d2d2d;
+      font-size: 1em;
+      border: 3px solid var(--element-border);
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: var(--small-shadow);
+      margin-top: 10px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    body.dark-mode .seller-btn {
+      color: #ffe600;
+    }
+    .seller-btn:hover { background-color: #218838; }
+
+    .reset-btn {
+      background-color: #ff9900;
+      color: #2d2d2d;
+      font-size: 0.9em;
+      border: 3px solid var(--element-border);
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: var(--small-shadow);
+      margin-top: 8px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    body.dark-mode .reset-btn {
+      color: #ffe600;
+    }
+    .reset-btn:hover { background-color: #cc7a00; }
+
+    .order-btn {
+      background-color: #ff3333;
+      color: #2d2d2d;
+      font-size: 1em;
+      border: 3px solid var(--element-border);
+      padding: 10px 15px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: var(--small-shadow);
+      margin-top: 10px;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+    body.dark-mode .order-btn {
+      color: #ffe600;
+    }
+    .order-btn:hover { background-color: #cc0000; }
+
+    /* Search & Filter Bar Styles */
+    .filter-container {
+      text-align: center;
+      margin: 25px auto 10px auto;
+      max-width: 900px;
+      padding: 0 15px;
+    }
+    .search-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    #search-input {
+      width: 65%;
+      min-width: 260px;
+      padding: 12px 15px;
+      border: 4px solid var(--element-border);
+      border-radius: 10px;
+      font-weight: bold;
+      font-family: inherit;
+      font-size: 1em;
+      box-shadow: var(--box-shadow);
+      box-sizing: border-box;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      transition: all 0.3s;
+    }
+    .surprise-btn {
+      background-color: #9900ff;
+      color: #2d2d2d;
+      border: 4px solid var(--element-border);
+      padding: 12px 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: var(--box-shadow);
+      font-size: 1em;
+      transition: all 0.3s;
+    }
+    body.dark-mode .surprise-btn {
+      color: #ffe600;
+    }
+    .surprise-btn:hover { background-color: #7a00cc; }
+
+    .filter-chips-wrapper {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+    .filter-chip {
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      border: 3px solid var(--element-border);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: var(--small-shadow);
+      font-family: inherit;
+      font-size: 0.9em;
+      transition: transform 0.1s, background-color 0.3s, border-color 0.3s;
+    }
+    .filter-chip:hover {
+      transform: translateY(-2px);
+    }
+    .filter-chip.active {
+      background-color: #ff3333;
+      color: #2d2d2d;
+      border-color: var(--element-border);
+    }
+    body.dark-mode .filter-chip.active {
+      color: #ffe600;
+    }
+
+    .grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: var(--card-bg);
+      color: var(--text-color);
+      border: 4px solid var(--element-border);
+      border-radius: 12px;
+      padding: 15px;
+      width: 220px;
+      text-align: center;
+      box-shadow: var(--box-shadow);
+      position: relative;
+      transition: all 0.3s;
+    }
+    .card img {
+      max-width: 120px;
+      height: 120px;
+      object-fit: contain;
+    }
+    .card-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      min-height: 24px;
+    }
+    .ribbon {
+      padding: 4px 8px;
+      font-size: 0.75em;
+      font-weight: bold;
+      border: 2px solid var(--element-border);
+      border-radius: 6px;
+      box-shadow: 2px 2px 0px var(--element-border);
+      transition: border-color 0.3s;
+    }
+    .ribbon.hot { background-color: #ff3333; color: #2d2d2d; }
+    body.dark-mode .ribbon.hot { color: #ffe600; }
+    .ribbon.new { background-color: #28a745; color: #2d2d2d; }
+    body.dark-mode .ribbon.new { color: #ffe600; }
+
+    .delete-btn {
+      background: #ff4d4d;
+      color: #2d2d2d;
+      border: 2px solid var(--element-border);
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-size: 0.85em;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 2px 2px 0px var(--element-border);
+      transition: transform 0.1s;
+    }
+    body.dark-mode .delete-btn {
+      color: #ffe600;
+    }
+    .delete-btn:hover {
+      background: #cc0000;
+      transform: scale(1.05);
+    }
+
+    .price {
+      color: #ff3333;
+      font-size: 1.3em;
+      margin: 10px 0;
+    }
+    body.dark-mode .price {
+      color: #ffe600;
+    }
+    .buy-btn {
+      background-color: #0088cc;
+      color: #2d2d2d;
+      border: 2px solid var(--element-border);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: border-color 0.3s;
+    }
+    body.dark-mode .buy-btn {
+      color: #ffe600;
+    }
+    .total-box {
+      background-color: #ffcc00;
+      color: #2d2d2d;
+      border: 3px solid var(--element-border);
+      border-radius: 6px;
+      padding: 8px;
+      width: 90%;
+      margin: 10px auto;
+      font-size: 1.1em;
+      font-weight: bold;
+      box-sizing: border-box;
+      transition: border-color 0.3s;
+    }
+  </style>
+</head>
+<body id="page-body">
+
+  <header>
+    <button class="theme-toggle-btn" onclick="toggleDarkMode()">🌙 Night Mode</button>
+    <h1>🐶 DOG MAN MARKETPLACE 🚨</h1>
+  </header>
+
+  <!-- LIVE AUDIO PLAYER WIDGET -->
+  <div style="background: var(--card-bg); border: 4px solid var(--element-border); padding: 15px; border-radius: 12px; text-align: center; max-width: 380px; margin: 20px auto; box-shadow: var(--box-shadow); transition: all 0.3s;">
+    <h3 style="margin-top: 0;">🎵 Live Synced Announcement 🎵</h3>
     
-    renderItems(allItems);
-    updateOrderDropdown(); // Refresh checkout list if needed
-}
+    <select id="audio-select" onchange="changeTrackBroadcast()">
+      <option value="kontraa-no-sleep-hiphop-music-473847.mp3">kontraa no sleep</option>
+      <option value="XENOGENESIS.mp3">xenogenesis</option>
+      <option value="spotifydown.com - Beautiful Things.mp3">Beautiful Things</option>
+      <option value="C418 - Aria Math (Synthwave).mp3">Aria Math</option>
+      <option value="alex-morgan-calm-still-water-breathing-578483.mp3">calm</option>
+    </select><br>
+
+    <audio id="sync-audio" src="kontraa-no-sleep-hiphop-music-473847.mp3" preload="auto" onended="handleTrackEnd()"></audio>
+    
+    <button id="audio-play-btn" onclick="toggleAudio()" style="background-color: #0088cc; color: #2d2d2d; border: 3px solid var(--element-border); padding: 10px 20px; font-size: 1.1em; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 8px; transition: border-color 0.3s;">
+      ▶️ Play for Everyone
+    </button>
+    
+    <p id="audio-status" style="font-size: 0.85em; font-weight: bold; margin-top: 10px; color: #888;">
+      Connecting to sync network...
+    </p>
+  </div>
+
+  <div class="container">
+    <!-- SELLER SECTION -->
+    <div class="seller-section">
+      <h2>⚡ Sell Supa Merch ⚡</h2>
+      <input type="text" id="title" placeholder="Item Name (e.g., Supa Buddy Pin)" required><br>
+      <input type="number" id="price" placeholder="Price ($)" step="0.01" required><br>
+      
+      <input type="text" id="image-url" placeholder="Paste Image URL (https...)"><br>
+      
+      <div style="font-weight: bold; margin: 4px 0;">— OR —</div>
+      
+      <label style="font-size: 0.85em; font-weight: bold; display: block;">Upload Image File:</label>
+      <input type="file" id="image-file" accept="image/*"><br>
+      
+      <button class="seller-btn" onclick="addItem()">List Item!</button><br>
+      <button class="reset-btn" onclick="resetDefaultItems()">🔄 Reset Default Items</button>
+    </div>
+
+    <!-- ORDER SECTION -->
+    <div class="checkout-section">
+      <h2>📦 Order & Choose Address <span id="cart-badge" style="background:#ff3333; color:#2d2d2d; border:2px solid var(--element-border); padding:2px 6px; border-radius:12px; font-size:0.8em; transition: border-color 0.3s;">(0)</span></h2>
+      
+      <select id="cust-name" required>
+        <option value="" disabled selected>-- Select Your Name --</option>
+        <option value="Arthur">Arthur</option>
+        <option value="Denise">Denise</option>
+        <option value="Josh">Josh</option>
+        <option value="Luna">Luna</option>
+      </select><br>
+
+      <div style="font-weight: bold; margin-top: 5px;">Select Items to Order:</div>
+      <div id="item-checkboxes" class="item-checkbox-container">
+        <p style="margin: 0; color: gray;">No items listed yet.</p>
+      </div>
+
+      <div class="total-box">
+        Total Amount: <span id="live-total">$0.00</span>
+      </div>
+
+      <div style="font-weight: bold; margin-top: 10px;">Select Delivery Address:</div>
+      
+      <!-- Visual Address Menu Cards -->
+      <div class="address-grid">
+        <label class="address-card" onclick="selectAddress(this)">
+          <input type="radio" name="cust-address" value="Bomboklat Street 1">
+          <img src="img-bomboklat1.jpg" alt="Bomboklat Street 1" onerror="this.src='https://via.placeholder.com/100?text=Bomboklat+1'">
+          <span>Bomboklat Street 1</span>
+        </label>
+
+        <label class="address-card" onclick="selectAddress(this)">
+          <input type="radio" name="cust-address" value="Bomboklat Street 2">
+          <img src="img-bomboklat2.jpg" alt="Bomboklat Street 2" onerror="this.src='https://via.placeholder.com/100?text=Bomboklat+2'">
+          <span>Bomboklat Street 2</span>
+        </label>
+
+        <label class="address-card" onclick="selectAddress(this)">
+          <input type="radio" name="cust-address" value="Factory Street">
+          <img src="img-factory.jpg" alt="Factory Street" onerror="this.src='https://via.placeholder.com/100?text=Factory'">
+          <span>Factory Street</span>
+        </label>
+
+        <label class="address-card" onclick="selectAddress(this)">
+          <input type="radio" name="cust-address" value="Oral B Street">
+          <img src="img-oralb.jpg" alt="Oral B Street" onerror="this.src='https://via.placeholder.com/100?text=Oral+B'">
+          <span>Oral B Street</span>
+        </label>
+
+        <label class="address-card" onclick="selectAddress(this)">
+          <input type="radio" name="cust-address" value="Flower Street">
+          <img src="img-flower.jpg" alt="Flower Street" onerror="this.src='https://via.placeholder.com/100?text=Flower'">
+          <span>Flower Street</span>
+        </label>
+
+        <label class="address-card" onclick="selectAddress(this)">
+          <input type="radio" name="cust-address" value="Garage Street">
+          <img src="img-garage.jpg" alt="Garage Street" onerror="this.src='https://via.placeholder.com/100?text=Garage'">
+          <span>Garage Street</span>
+        </label>
+
+        <label class="address-card" onclick="selectAddress(this)">
+          <input type="radio" name="cust-address" value="Garden Street 1">
+          <img src="img-garden1.jpg" alt="Garden Street 1" onerror="this.src='https://via.placeholder.com/100?text=Garden+1'">
+          <span>Garden Street 1</span>
+        </label>
+
+        <label class="address-card" onclick="selectAddress(this)">
+          <input type="radio" name="cust-address" value="Garden Street 2">
+          <img src="img-garden2.jpg" alt="Garden Street 2" onerror="this.src='https://via.placeholder.com/100?text=Garden+2'">
+          <span>Garden Street 2</span>
+        </label>
+
+        <label class="address-card" onclick="selectAddress(this)">
+          <input type="radio" name="cust-address" value="Trampoline Street">
+          <img src="img-trampoline.jpg" alt="Trampoline Street" onerror="this.src='https://via.placeholder.com/100?text=Trampoline'">
+          <span>Trampoline Street</span>
+        </label>
+      </div>
+
+      <button class="order-btn" onclick="sendOrder()">Submit Order!</button>
+    </div>
+  </div>
+
+  <!-- SEARCH & FILTER BAR SECTION -->
+  <div class="filter-container">
+    <div class="search-row">
+      <input type="text" id="search-input" placeholder="🔍 Search items (e.g., Dog Man, Squishy, Purse)..." oninput="displayProducts()">
+      <button class="surprise-btn" onclick="surpriseMe()">🎲 Surprise Me!</button>
+    </div>
+    <div class="filter-chips-wrapper">
+      <button class="filter-chip active" onclick="setFilter('all', this)">All Items</button>
+      <button class="filter-chip" onclick="setFilter('Dog Man', this)">Dog Man</button>
+      <button class="filter-chip" onclick="setFilter('Squishy', this)">Squishies</button>
+      <button class="filter-chip" onclick="setFilter('Purse', this)">Purses</button>
+      <button class="filter-chip" onclick="setFilter('Federtasche', this)">Federtaschen</button>
+      <button class="filter-chip" onclick="setFilter('Lesezeichen', this)">Bookmarks</button>
+      <button class="filter-chip" onclick="setFilter('Fidget', this)">Fidgets</button>
+      <button class="filter-chip" onclick="setFilter('Algerian', this)">🇩🇿 Algerian</button>
+      <button class="filter-chip" onclick="setFilter('expensive', this)">Expensive</button>
+    </div>
+  </div>
+
+  <div id="product-container" class="grid"></div>
+
+  <script>
+    let currentFilter = 'all';
+
+    function setFilter(category, btnElement) {
+      currentFilter = category;
+      document.querySelectorAll('.filter-chip').forEach(btn => btn.classList.remove('active'));
+      btnElement.classList.add('active');
+      displayProducts();
+    }
+
+    function selectAddress(cardElement) {
+      document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
+      cardElement.classList.add('selected');
+      const radio = cardElement.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+    }
+
+    function toggleDarkMode() {
+      const body = document.getElementById('page-body');
+      body.classList.toggle('dark-mode');
+      const btn = document.querySelector('.theme-toggle-btn');
+      if (body.classList.contains('dark-mode')) {
+        btn.innerText = "☀️ Light Mode";
+      } else {
+        btn.innerText = "🌙 Night Mode";
+      }
+    }
+
+    function surpriseMe() {
+      const products = getProducts();
+      if (products.length === 0) return;
+      const randomItem = products[Math.floor(Math.random() * products.length)];
+      document.getElementById('search-input').value = randomItem.title;
+      displayProducts();
+    }
+
+    // ==========================================
+    // 1. PUSHER LIVE SYNC SETUP (AUDIO)
+    // ==========================================
+    const PUSHER_KEY = "3651c3c833375dea577d";
+    const PUSHER_CLUSTER = "eu";
+
+    const pusher = new Pusher(PUSHER_KEY, {
+      cluster: PUSHER_CLUSTER
+    });
+
+    const channel = pusher.subscribe('audio-room');
+    const audio = document.getElementById('sync-audio');
+    const audioSelect = document.getElementById('audio-select');
+    const playBtn = document.getElementById('audio-play-btn');
+    const statusText = document.getElementById('audio-status');
+
+    pusher.connection.bind('connected', () => {
+      statusText.innerText = "Connected! Tap Play to sync.";
+    });
+
+    channel.bind('client-audio-control', function(data) {
+      if (data.track && audioSelect.value !== data.track) {
+        audioSelect.value = data.track;
+        audio.src = data.track;
+      }
+
+      audio.currentTime = data.time;
+
+      if (data.action === 'play') {
+        audio.play().then(() => {
+          playBtn.innerText = "⏸️ Pause for Everyone";
+          statusText.innerText = "Playing in sync!";
+        }).catch(() => {
+          statusText.innerText = "⚠️ Tap anywhere on screen to allow sound!";
+        });
+      } else if (data.action === 'pause') {
+        audio.pause();
+        playBtn.innerText = "▶️ Play for Everyone";
+        statusText.innerText = "Paused remotely.";
+      }
+    });
+
+    function changeTrackBroadcast() {
+      audio.src = audioSelect.value;
+      audio.currentTime = 0;
+      audio.pause();
+      playBtn.innerText = "▶️ Play for Everyone";
+      statusText.innerText = "Track changed. Ready to sync.";
+
+      channel.trigger('client-audio-control', {
+        action: 'pause',
+        time: 0,
+        track: audioSelect.value
+      });
+    }
+
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play();
+        playBtn.innerText = "⏸️ Pause for Everyone";
+        statusText.innerText = "Broadcasting Play...";
+
+        channel.trigger('client-audio-control', {
+          action: 'play',
+          time: audio.currentTime,
+          track: audioSelect.value
+        });
+      } else {
+        audio.pause();
+        playBtn.innerText = "▶️ Play for Everyone";
+        statusText.innerText = "Broadcasting Pause...";
+
+        channel.trigger('client-audio-control', {
+          action: 'pause',
+          time: audio.currentTime,
+          track: audioSelect.value
+        });
+      }
+    }
+
+    function handleTrackEnd() {
+      let currentIndex = audioSelect.selectedIndex;
+      let nextIndex = (currentIndex + 1) % audioSelect.options.length;
+      
+      audioSelect.selectedIndex = nextIndex;
+      audio.src = audioSelect.value;
+      audio.currentTime = 0;
+
+      audio.play().then(() => {
+        playBtn.innerText = "⏸️ Pause for Everyone";
+        statusText.innerText = "Playing next track!";
+
+        channel.trigger('client-audio-control', {
+          action: 'play',
+          time: 0,
+          track: audioSelect.value
+        });
+      }).catch(() => {
+        statusText.innerText = "⚠️ Tap anywhere on screen to allow sound!";
+      });
+    }
+
+    // ==========================================
+    // 2. DEFAULT PRODUCTS & STORAGE LOGIC
+    // ==========================================
+    const defaultProducts = [
+      { id: 1718500000001, title: 'Algerian Flag Lesezeichen', price: '4.00', image: 'https://via.placeholder.com/120?text=Algerian+Flag' },
+      { id: 1718500000002, title: 'Algerian Mint Tea Squishy', price: '9.00', image: 'https://via.placeholder.com/120?text=Algerian+Mint+Tea' },
+      { id: 1718500000003, title: 'Aloha Hawaii Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Aloha+Hawaii' },
+      { id: 1718500000004, title: 'If you can dream', price: '5.00', image: 'https://via.placeholder.com/120?text=If+You+Can+Dream' },
+      { id: 1718500000005, title: 'Egg Squishy', price: '4.00', image: 'https://via.placeholder.com/120?text=Egg+Squishy' },
+      { id: 1718500000006, title: 'Weihnachtsbaum Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Weihnachtsbaum+Purse' },
+      { id: 1718500000007, title: 'Blue Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blue+Purse' },
+      { id: 1718500000008, title: 'Pink Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Pink+Purse' },
+      { id: 1718500000009, title: 'Blatt Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blatt+Purse' },
+      { id: 1718500000010, title: 'Moschea Purse', price: '50.00', image: 'https://via.placeholder.com/120?text=Moschea+Purse' },
+      { id: 1718500000011, title: 'Small Star Fidget', price: '4.00', image: 'https://via.placeholder.com/120?text=Small+Star+Fidget' },
+      { id: 1718500000012, title: 'Big Star Fidget', price: '8.00', image: 'https://via.placeholder.com/120?text=Big+Star+Fidget' },
+      { id: 1718500000013, title: 'Sajadah Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Sajadah+Lesezeichen' },
+      { id: 1718500000014, title: 'Spezi', price: '5.00', image: 'https://via.placeholder.com/120?text=Spezi' },
+      { id: 1718500000015, title: 'Cake Squishy', price: '20.00', image: 'https://via.placeholder.com/120?text=Cake+Squishy' },
+      { id: 1718500000016, title: 'Pikachu Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Pikachu+Federtasche' },
+      { id: 1718500000017, title: 'Banana Kid Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Banana+Kid+Squishy' },
+      { id: 1718500000018, title: 'STW Squishy', price: '50.00', image: 'https://via.placeholder.com/120?text=STW+Squishy' },
+      { id: 1718500000019, title: 'Mikey Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Mikey+Squishy' },
+      { id: 1718500000020, title: 'JJ Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=JJ+Squishy' },
+      { id: 1718500000021, title: 'SERIE A Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=SERIE+A+Squishy' },
+      { id: 1718500000022, title: 'QuestionMark Block Squish...', price: '2.00', image: 'https://via.placeholder.com/120?text=QuestionMark+Block' },
+      { id: 1718500000023, title: '1up squishy', price: '2.00', image: 'https://via.placeholder.com/120?text=1up+squishy' },
+      { id: 1718500000024, title: 'Stitch Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Federtasche' },
+      { id: 1718500000025, title: 'Herlitz Freedom Tasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Herlitz+Freedom' },
+      { id: 1718500000026, title: 'Crocodile Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Crocodile+Federtasche' },
+      { id: 1718500000027, title: 'Stitch Legami Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Legami' },
+      { id: 1718500000028, title: 'Gedagedigedaggedo Leseze...', price: '3.00', image: 'https://via.placeholder.com/120?text=Gedagedigedaggedo' },
+      { id: 1718500000029, title: 'Cinnamoroll Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Cinnamoroll' },
+      { id: 1718500000030, title: 'Egg Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Egg+Lesezeichen' },
+      { id: 1718500000031, title: 'Dog Man 12', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+12' },
+      { id: 1718500000032, title: 'Dog Man 11', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+11' },
+      { id: 1718500000033, title: 'Dog Man 10', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+10' },
+      { id: 1718500000034, title: 'Dog Man 9', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+9' },
+      { id: 1718500000035, title: 'Dog Man 8', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+8' },
+      { id: 1718500000036, title: 'Dog Man 7', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+7' },
+      { id: 1718500000037, title: 'Dog Man 6', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+6' },
+      { id: 1718500000038, title: 'Dog Man 5', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+5' },
+      { id: 1718500000039, title: 'Dog Man 4', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+4' },
+      { id: 1718500000040, title: 'Dog Man 3', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+3' },
+      { id: 1718500000041, title: 'Dog Man 2', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+2' },
+      { id: 1718500000042, title: 'Dog Man 1', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+1' }
+    ];
+
+    function getProducts() {
+      try {
+        const data = localStorage.getItem('dogman_products');
+        if (data) {
+          const parsed = JSON.parse(data);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            // Ensure every item has a reliable unique id fallback
+            return parsed.map((item, idx) => ({
+              ...item,
+              id: item.id || (1718500000000 + idx)
+            }));
+          }
+        }
+      } catch (e) {
+        localStorage.removeItem('dogman_products');
+      }
+      return defaultProducts;
+    }
+
+    function saveProducts(products) {
+      try {
+        localStorage.setItem('dogman_products', JSON.stringify(products));
+      } catch (e) {
+        alert("Image file size is too big! Please paste an Image Link (https://) instead.");
+      }
+    }
+
+    function resetDefaultItems() {
+      if (confirm("Are you sure you want to reset back to the default items?")) {
+        localStorage.removeItem('dogman_products');
+        displayProducts();
+      }
+    }
+
+    function deleteItem(itemId) {
+      let products = getProducts();
+      // Ensure strict type comparison for unique IDs
+      products = products.filter(p => String(p.id) !== String(itemId));
+      saveProducts(products);
+      displayProducts();
+    }
+
+    function updateLiveTotal() {
+      const products = getProducts();
+      const selectedBoxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked');
+      let total = 0;
+
+      selectedBoxes.forEach(cb => {
+        const product = products.find(p => String(p.id) === String(cb.value));
+        if (product) total += parseFloat(product.price) || 0;
+      });
+
+      const totalDisplay = document.getElementById('live-total');
+      if (totalDisplay) {
+        totalDisplay.innerText = `$${total.toFixed(2)}`;
+      }
+
+      const badge = document.getElementById('cart-badge');
+      if (badge) {
+        badge.innerText = `(${selectedBoxes.length})`;
+      }
+    }
+
+    function updateItemCheckboxes(products) {
+      const container = document.getElementById('item-checkboxes');
+      if (!container) return;
+
+      if (!products || products.length === 0) {
+        container.innerHTML = '<p style="margin: 0; color: gray;">No items available.</p>';
+        updateLiveTotal();
+        return;
+      }
+
+      const checkedIds = Array.from(document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked'))
+                              .map(cb => cb.value);
+
+      container.innerHTML = products.map((item, index) => {
+        const uniqueId = item.id || (1718500000000 + index);
+        const isChecked = checkedIds.includes(String(uniqueId)) ? 'checked' : '';
+        return `
+          <div class="item-checkbox-row">
+            <input type="checkbox" id="item-check-${uniqueId}" value="${uniqueId}" ${isChecked} onchange="updateLiveTotal()">
+            <label for="item-check-${uniqueId}">${item.title} ($${parseFloat(item.price).toFixed(2)})</label>
+          </div>
+        `;
+      }).join('');
+
+      updateLiveTotal();
+    }
+
+    function displayProducts() {
+      const container = document.getElementById('product-container');
+      if (!container) return;
+
+      const products = getProducts();
+      updateItemCheckboxes(products);
+
+      const searchQuery = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
+
+      const filteredProducts = products.filter((item, index) => {
+        const matchesSearch = item.title.toLowerCase().includes(searchQuery);
+        
+        let matchesCategory = true;
+        if (currentFilter === 'all') {
+          matchesCategory = true;
+        } else if (currentFilter === 'expensive') {
+          matchesCategory = parseFloat(item.price) >= 40;
+        } else {
+          matchesCategory = item.title.toLowerCase().includes(currentFilter.toLowerCase());
+        }
+
+        return matchesSearch && matchesCategory;
+      });
+
+      if (!filteredProducts || filteredProducts.length === 0) {
+        container.innerHTML = '<p style="font-weight: bold; font-size: 1.2em;">No matching items found!</p>';
+        return;
+      }
+
+      const oneAndHalfHoursInMs = 1.5 * 60 * 60 * 1000;
+      const now = Date.now();
+
+      container.innerHTML = filteredProducts.map((item, index) => {
+        const uniqueId = item.id || (1718500000000 + index);
+        const safeTitle = (item.title || 'Item').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        const imgSrc = item.image || 'https://via.placeholder.com/120?text=No+Image';
+        
+        let ribbonHtml = '';
+        if (item.title.toLowerCase().includes('dog man') || item.title.toLowerCase().includes('algerian')) {
+          ribbonHtml = '<div class="ribbon hot">🔥 HOT</div>';
+        } else if (now - uniqueId < oneAndHalfHoursInMs) {
+          ribbonHtml = '<div class="ribbon new">✨ NEW</div>';
+        }
+
+        return `
+          <div class="card">
+            <div class="card-top-bar">
+              ${ribbonHtml}
+              <button class="delete-btn" onclick="deleteItem('${uniqueId}')" title="Delete Item">🗑️</button>
+            </div>
+            <img src="${imgSrc}" alt="${safeTitle}" onerror="this.src='https://via.placeholder.com/120?text=Invalid+Image'">
+            <h4>${safeTitle.length > 25 ? safeTitle.substring(0, 25) + '...' : safeTitle}</h4>
+            <div class="price">$${parseFloat(item.price).toFixed(2)}</div>
+            <button class="buy-btn" onclick="quickBuy('${uniqueId}')">Buy Item</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function addItem() {
+      const title = document.getElementById('title').value.trim();
+      const price = document.getElementById('price').value.trim();
+      let imageUrl = document.getElementById('image-url').value.trim();
+      const fileInput = document.getElementById('image-file');
+
+      if (!title || !price) {
+        alert('Please fill in the item name and price!');
+        return;
+      }
+
+      if (!imageUrl && fileInput.files.length === 0) {
+        alert('Please either paste an Image URL OR upload an Image File!');
+        return;
+      }
+
+      function saveProduct(finalImage) {
+        const products = getProducts();
+        products.unshift({
+          id: Date.now(),
+          title: title,
+          price: price,
+          image: finalImage
+        });
+
+        saveProducts(products);
+
+        document.getElementById('title').value = '';
+        document.getElementById('price').value = '';
+        document.getElementById('image-url').value = '';
+        fileInput.value = '';
+
+        displayProducts();
+      }
+
+      if (fileInput.files.length > 0) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          saveProduct(e.target.result);
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
+          imageUrl = 'https://' + imageUrl;
+        }
+        saveProduct(imageUrl);
+      }
+    }
+
+    function quickBuy(itemId) {
+      const checkboxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]');
+      checkboxes.forEach(cb => {
+        if (cb.value == itemId) {
+          cb.checked = true;
+        }
+      });
+      updateLiveTotal();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function sendOrder() {
+      const customer = document.getElementById('cust-name').value;
+      const selectedAddressRadio = document.querySelector('input[name="cust-address"]:checked');
+      const address = selectedAddressRadio ? selectedAddressRadio.value : '';
+      const selectedBoxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked');
+
+      if (!customer || selectedBoxes.length === 0 || !address) {
+        alert('Please select a name, at least ONE item, and an address!');
+        return;
+      }
+
+      const products = getProducts();
+      const selectedItems = [];
+      let totalPrice = 0;
+
+      selectedBoxes.forEach(cb => {
+        const itemId = cb.value;
+        const foundProduct = products.find(p => String(p.id) === String(itemId));
+        if (foundProduct) {
+          selectedItems.push(foundProduct.title);
+          totalPrice += parseFloat(foundProduct.price) || 0;
+        }
+      });
+
+      const formattedTotal = `$${totalPrice.toFixed(2)}`;
+      const FORMSPREE_URL = "https://formspree.io/f/maewbvzr";
+
+      fetch(FORMSPREE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          "email": "leonifares34@gmail.com",
+          "_replyto": "leonifares34@gmail.com",
+          "Customer Name": customer,
+          "Items Ordered": selectedItems.join(', '),
+          "Total Items": selectedItems.length,
+          "Total Price": formattedTotal,
+          "Delivery Address": address
+        })
+      })
+      .then(res => {
+        if (res.ok) {
+          alert(`Order sent successfully! (${selectedItems.length} items ordered for ${formattedTotal})`);
+
+          document.getElementById('cust-name').selectedIndex = 0;
+          document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
+          document.querySelectorAll('input[name="cust-address"]').forEach(r => r.checked = false);
+          document.querySelectorAll('#item-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
+          updateLiveTotal();
+        } else {
+          res.json().then(data => {
+            console.error('Formspree response error:', data);
+            alert('Formspree error: ' + (data.error || 'Check form configuration or monthly limit.'));
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Network Error:', err);
+        alert('Network error: ' + err.message);
+      });
+    }
+
+    window.onload = function() {
+      displayProducts();
+    };
+  </script>
+
+</body>
+</html>
