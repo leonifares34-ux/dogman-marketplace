@@ -28,7 +28,7 @@
       max-width: 1100px;
       padding: 0 10px;
     }
-    .seller-section, .checkout-section {
+    .seller-section, .checkout-section, .queue-section {
       background-color: #ffffff;
       border: 4px solid black;
       box-shadow: 5px 5px 0px black;
@@ -44,7 +44,13 @@
       background-color: #0088cc;
       color: white;
     }
-    .seller-section input, .checkout-section input, .checkout-section select {
+    .queue-section {
+      background-color: #ffcc00;
+      max-width: 1000px;
+      width: 90%;
+      margin: 20px auto 0 auto;
+    }
+    .seller-section input, .checkout-section input, .checkout-section select, #audio-select {
       width: 90%;
       padding: 10px;
       margin: 6px 0;
@@ -168,6 +174,43 @@
       font-weight: bold;
       box-sizing: border-box;
     }
+    /* QUEUE CARDS STYLING */
+    .queue-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 15px;
+    }
+    .queue-card {
+      background: white;
+      border: 3px solid black;
+      border-radius: 8px;
+      padding: 10px 15px;
+      box-shadow: 3px 3px 0px black;
+      min-width: 200px;
+      text-align: left;
+    }
+    .queue-card h4 {
+      margin: 0 0 5px 0;
+      color: #0088cc;
+    }
+    .queue-card p {
+      margin: 3px 0;
+      font-size: 0.9em;
+    }
+    .finish-btn {
+      background-color: #28a745;
+      color: white;
+      border: 2px solid black;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.8em;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 8px;
+      width: 100%;
+    }
   </style>
 </head>
 <body>
@@ -177,19 +220,35 @@
   </header>
 
   <!-- 🎵 LIVE AUDIO PLAYER WIDGET 🎵 -->
-  <div style="background: white; border: 4px solid black; padding: 15px; border-radius: 12px; text-align: center; max-width: 350px; margin: 20px auto; box-shadow: 5px 5px 0px black;">
+  <div style="background: white; border: 4px solid black; padding: 15px; border-radius: 12px; text-align: center; max-width: 380px; margin: 20px auto; box-shadow: 5px 5px 0px black;">
     <h3 style="margin-top: 0;">🎵 Live Synced Announcement 🎵</h3>
     
-    <!-- Audio File Link -->
-    <audio id="sync-audio" src="b034f43a-696b-4271-b845-d780ccff45aa.wav" preload="auto"></audio>
+    <!-- Audio File Select Dropdown -->
+    <select id="audio-select" onchange="changeTrackBroadcast()">
+      <option value="kontraa-no-sleep-hiphop-music-473847.mp3">kontraa no sleep</option>
+      <option value="XENOGENESIS.mp3">xenogenesis</option>
+      <option value="spotifydown.com - Beautiful Things.mp3">Beautiful Things</option>
+      <option value="C418 - Aria Math (Synthwave).mp3">Aria Math</option>
+      <option value="alex-morgan-calm-still-water-breathing-578483.mp3">calm</option>
+    </select><br>
+
+    <audio id="sync-audio" src="audio1.mp3" preload="auto"></audio>
     
-    <button id="audio-play-btn" onclick="toggleAudio()" style="background-color: #0088cc; color: white; border: 3px solid black; padding: 10px 20px; font-size: 1.1em; font-weight: bold; border-radius: 8px; cursor: pointer;">
+    <button id="audio-play-btn" onclick="toggleAudio()" style="background-color: #0088cc; color: white; border: 3px solid black; padding: 10px 20px; font-size: 1.1em; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 8px;">
       ▶️ Play for Everyone
     </button>
     
     <p id="audio-status" style="font-size: 0.85em; font-weight: bold; margin-top: 10px; color: #555;">
       Connecting to sync network...
     </p>
+  </div>
+
+  <!-- 📋 LIVE ORDER QUEUE SECTION 📋 -->
+  <div class="queue-section">
+    <h2>📋 Live Order Queue 📋</h2>
+    <div id="queue-container" class="queue-list">
+      <p style="margin: 0; color: black; font-weight: bold;">No active orders in queue.</p>
+    </div>
   </div>
 
   <div class="container">
@@ -248,7 +307,7 @@
 
   <script>
     // ==========================================
-    // 1. PUSHER LIVE AUDIO SYNC SETUP
+    // 1. PUSHER LIVE SYNC SETUP (AUDIO + QUEUE)
     // ==========================================
     const PUSHER_KEY = "3651c3c833375dea577d";
     const PUSHER_CLUSTER = "eu";
@@ -259,6 +318,7 @@
 
     const channel = pusher.subscribe('audio-room');
     const audio = document.getElementById('sync-audio');
+    const audioSelect = document.getElementById('audio-select');
     const playBtn = document.getElementById('audio-play-btn');
     const statusText = document.getElementById('audio-status');
 
@@ -267,6 +327,11 @@
     });
 
     channel.bind('client-audio-control', function(data) {
+      if (data.track && audioSelect.value !== data.track) {
+        audioSelect.value = data.track;
+        audio.src = data.track;
+      }
+
       audio.currentTime = data.time;
 
       if (data.action === 'play') {
@@ -283,6 +348,35 @@
       }
     });
 
+    // QUEUE SYNC EVENTS
+    channel.bind('client-new-order', function(orderData) {
+      const queue = getQueue();
+      queue.push(orderData);
+      saveQueue(queue);
+      displayQueue();
+    });
+
+    channel.bind('client-complete-order', function(data) {
+      let queue = getQueue();
+      queue = queue.filter(o => o.id !== data.id);
+      saveQueue(queue);
+      displayQueue();
+    });
+
+    function changeTrackBroadcast() {
+      audio.src = audioSelect.value;
+      audio.currentTime = 0;
+      audio.pause();
+      playBtn.innerText = "▶️ Play for Everyone";
+      statusText.innerText = "Track changed. Ready to sync.";
+
+      channel.trigger('client-audio-control', {
+        action: 'pause',
+        time: 0,
+        track: audioSelect.value
+      });
+    }
+
     function toggleAudio() {
       if (audio.paused) {
         audio.play();
@@ -291,7 +385,8 @@
 
         channel.trigger('client-audio-control', {
           action: 'play',
-          time: audio.currentTime
+          time: audio.currentTime,
+          track: audioSelect.value
         });
       } else {
         audio.pause();
@@ -300,22 +395,118 @@
 
         channel.trigger('client-audio-control', {
           action: 'pause',
-          time: audio.currentTime
+          time: audio.currentTime,
+          track: audioSelect.value
         });
       }
     }
 
     // ==========================================
-    // 2. LOCALSTORAGE PRODUCT & ORDER LOGIC
+    // 2. ORDER QUEUE LOGIC
     // ==========================================
+    function getQueue() {
+      try {
+        const data = localStorage.getItem('dogman_order_queue');
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        localStorage.removeItem('dogman_order_queue');
+        return [];
+      }
+    }
+
+    function saveQueue(queue) {
+      try {
+        localStorage.setItem('dogman_order_queue', JSON.stringify(queue));
+      } catch (e) {}
+    }
+
+    function displayQueue() {
+      const container = document.getElementById('queue-container');
+      if (!container) return;
+
+      const queue = getQueue();
+
+      if (!queue || queue.length === 0) {
+        container.innerHTML = '<p style="margin: 0; color: black; font-weight: bold;">No active orders in queue.</p>';
+        return;
+      }
+
+      container.innerHTML = queue.map((order, index) => `
+        <div class="queue-card">
+          <h4>#${index + 1} - ${order.customer}</h4>
+          <p><strong>Total:</strong> ${order.total}</p>
+          <p><strong>Address:</strong> ${order.address}</p>
+          <button class="finish-btn" onclick="completeOrder(${order.id})">Mark Completed</button>
+        </div>
+      `).join('');
+    }
+
+    function completeOrder(orderId) {
+      let queue = getQueue();
+      queue = queue.filter(o => o.id !== orderId);
+      saveQueue(queue);
+      displayQueue();
+
+      channel.trigger('client-complete-order', { id: orderId });
+    }
+
+    // ==========================================
+    // 3. DEFAULT PRODUCTS & STORAGE LOGIC
+    // ==========================================
+    const defaultProducts = [
+      { id: 1, title: 'Aloha Hawaii Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Aloha+Hawaii' },
+      { id: 2, title: 'If you can dream', price: '5.00', image: 'https://via.placeholder.com/120?text=If+You+Can+Dream' },
+      { id: 3, title: 'Egg Squishy', price: '4.00', image: 'https://via.placeholder.com/120?text=Egg+Squishy' },
+      { id: 4, title: 'Weihnachtsbaum Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Weihnachtsbaum+Purse' },
+      { id: 5, title: 'Blue Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blue+Purse' },
+      { id: 6, title: 'Pink Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Pink+Purse' },
+      { id: 7, title: 'Blatt Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blatt+Purse' },
+      { id: 8, title: 'Moschea Purse', price: '50.00', image: 'https://via.placeholder.com/120?text=Moschea+Purse' },
+      { id: 9, title: 'Small Star Fidget', price: '4.00', image: 'https://via.placeholder.com/120?text=Small+Star+Fidget' },
+      { id: 10, title: 'Big Star Fidget', price: '8.00', image: 'https://via.placeholder.com/120?text=Big+Star+Fidget' },
+      { id: 11, title: 'Sajadah Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Sajadah+Lesezeichen' },
+      { id: 12, title: 'Spezi', price: '5.00', image: 'https://via.placeholder.com/120?text=Spezi' },
+      { id: 13, title: 'Cake Squishy', price: '20.00', image: 'https://via.placeholder.com/120?text=Cake+Squishy' },
+      { id: 14, title: 'Pikachu Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Pikachu+Federtasche' },
+      { id: 15, title: 'Banana Kid Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Banana+Kid+Squishy' },
+      { id: 16, title: 'STW Squishy', price: '50.00', image: 'https://via.placeholder.com/120?text=STW+Squishy' },
+      { id: 17, title: 'Mikey Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Mikey+Squishy' },
+      { id: 18, title: 'JJ Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=JJ+Squishy' },
+      { id: 19, title: 'SERIE A Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=SERIE+A+Squishy' },
+      { id: 20, title: 'QuestionMark Block Squish...', price: '2.00', image: 'https://via.placeholder.com/120?text=QuestionMark+Block' },
+      { id: 21, title: '1up squishy', price: '2.00', image: 'https://via.placeholder.com/120?text=1up+squishy' },
+      { id: 22, title: 'Stitch Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Federtasche' },
+      { id: 23, title: 'Herlitz Freedom Tasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Herlitz+Freedom' },
+      { id: 24, title: 'Crocodile Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Crocodile+Federtasche' },
+      { id: 25, title: 'Stitch Legami Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Legami' },
+      { id: 26, title: 'Gedagedigedaggedo Leseze...', price: '3.00', image: 'https://via.placeholder.com/120?text=Gedagedigedaggedo' },
+      { id: 27, title: 'Cinnamoroll Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Cinnamoroll' },
+      { id: 28, title: 'Egg Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Egg+Lesezeichen' },
+      { id: 29, title: 'Dog Man 12', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+12' },
+      { id: 30, title: 'Dog Man 11', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+11' },
+      { id: 31, title: 'Dog Man 10', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+10' },
+      { id: 32, title: 'Dog Man 9', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+9' },
+      { id: 33, title: 'Dog Man 8', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+8' },
+      { id: 34, title: 'Dog Man 7', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+7' },
+      { id: 35, title: 'Dog Man 6', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+6' },
+      { id: 36, title: 'Dog Man 5', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+5' },
+      { id: 37, title: 'Dog Man 4', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+4' },
+      { id: 38, title: 'Dog Man 3', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+3' },
+      { id: 39, title: 'Dog Man 2', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+2' },
+      { id: 40, title: 'Dog Man 1', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+1' }
+    ];
+
     function getProducts() {
       try {
         const data = localStorage.getItem('dogman_products');
-        return data ? JSON.parse(data) : [];
+        if (data) {
+          const parsed = JSON.parse(data);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
       } catch (e) {
         localStorage.removeItem('dogman_products');
-        return [];
       }
+      return defaultProducts;
     }
 
     function saveProducts(products) {
@@ -355,7 +546,7 @@
       container.innerHTML = products.map((item, index) => `
         <div class="item-checkbox-row">
           <input type="checkbox" id="item-check-${index}" value="${item.title}" onchange="updateLiveTotal()">
-          <label for="item-check-${index}">${item.title} ($${item.price})</label>
+          <label for="item-check-${index}">${item.title} ($${parseFloat(item.price).toFixed(2)})</label>
         </div>
       `).join('');
 
@@ -381,7 +572,7 @@
           <div class="card">
             <img src="${imgSrc}" alt="${safeTitle}" onerror="this.src='https://via.placeholder.com/120?text=Invalid+Image'">
             <h4>${safeTitle.length > 25 ? safeTitle.substring(0, 25) + '...' : safeTitle}</h4>
-            <div class="price">$${item.price}</div>
+            <div class="price">$${parseFloat(item.price).toFixed(2)}</div>
             <button class="buy-btn" onclick="quickBuy('${safeTitle}')">Buy Item</button><br>
             <button class="delete-btn" onclick="deleteItem(${item.id})">Delete Item</button>
           </div>
@@ -484,6 +675,13 @@
       const formattedTotal = `$${totalPrice.toFixed(2)}`;
       const FORMSPREE_URL = "https://formspree.io/f/maewbvzr";
 
+      const orderData = {
+        id: Date.now(),
+        customer: customer,
+        total: formattedTotal,
+        address: address
+      };
+
       fetch(FORMSPREE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -498,6 +696,16 @@
       .then(res => {
         if (res.ok) {
           alert(`Order sent successfully! (${selectedItems.length} items ordered for ${formattedTotal})`);
+
+          // Add to local queue
+          const queue = getQueue();
+          queue.push(orderData);
+          saveQueue(queue);
+          displayQueue();
+
+          // Broadcast to connected users via Pusher
+          channel.trigger('client-new-order', orderData);
+
           document.getElementById('cust-name').selectedIndex = 0;
           document.getElementById('cust-address').selectedIndex = 0;
           document.querySelectorAll('#item-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
@@ -511,6 +719,7 @@
 
     window.onload = function() {
       displayProducts();
+      displayQueue();
     };
   </script>
 
