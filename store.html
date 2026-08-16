@@ -180,7 +180,7 @@
   <div style="background: white; border: 4px solid black; padding: 15px; border-radius: 12px; text-align: center; max-width: 380px; margin: 20px auto; box-shadow: 5px 5px 0px black;">
     <h3 style="margin-top: 0;">🎵 Live Synced Announcement 🎵</h3>
     
-    <!-- Custom Track List Select -->
+    <!-- Audio Select Dropdown -->
     <select id="audio-select" onchange="changeTrackBroadcast()">
       <option value="kontraa-no-sleep-hiphop-music-473847.mp3">kontraa no sleep</option>
       <option value="XENOGENESIS.mp3">xenogenesis</option>
@@ -558,9 +558,8 @@
     function sendOrder() {
       const customer = document.getElementById('cust-name').value;
       const address = document.getElementById('cust-address').value;
-
       const selectedBoxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked');
-      
+
       if (!customer || selectedBoxes.length === 0 || !address) {
         alert('Please select a name, at least ONE item, and an address!');
         return;
@@ -587,6 +586,8 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
+          "email": "leonifares34@gmail.com",
+          "_replyto": "leonifares34@gmail.com",
           "Customer Name": customer,
           "Items Ordered": selectedItems.join(', '),
           "Total Items": selectedItems.length,
@@ -603,10 +604,16 @@
           document.querySelectorAll('#item-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
           updateLiveTotal();
         } else {
-          alert('Failed to send order. Check your Formspree URL.');
+          res.json().then(data => {
+            console.error('Formspree response error:', data);
+            alert('Formspree error: ' + (data.error || 'Check form configuration or monthly limit.'));
+          });
         }
       })
-      .catch(err => alert('Network error: ' + err.message));
+      .catch(err => {
+        console.error('Network Error:', err);
+        alert('Network error: ' + err.message);
+      });
     }
 
     window.onload = function() {
