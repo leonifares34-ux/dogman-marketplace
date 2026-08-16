@@ -568,8 +568,7 @@
   <script>
     let currentFilter = 'all';
 
-    // In-memory array ONLY (No local storage persistence)
-    let productsList = [
+    const defaultProducts = [
       { id: 'def_1', title: 'Algerian Flag Lesezeichen', price: '4.00', image: 'https://via.placeholder.com/120?text=Algerian+Flag' },
       { id: 'def_2', title: 'Algerian Mint Tea Squishy', price: '9.00', image: 'https://via.placeholder.com/120?text=Algerian+Mint+Tea' },
       { id: 'def_3', title: 'Aloha Hawaii Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Aloha+Hawaii' },
@@ -614,6 +613,28 @@
       { id: 'def_41', title: 'Dog Man 2', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+2' },
       { id: 'def_42', title: 'Dog Man 1', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+1' }
     ];
+
+    // Load products from localStorage or fall back to defaults
+    let productsList = [];
+    try {
+      const savedProducts = localStorage.getItem('dogman_products');
+      if (savedProducts) {
+        productsList = JSON.parse(savedProducts);
+      } else {
+        productsList = [...defaultProducts];
+      }
+    } catch (e) {
+      console.error("Error loading from localStorage:", e);
+      productsList = [...defaultProducts];
+    }
+
+    function saveToLocalStorage() {
+      try {
+        localStorage.setItem('dogman_products', JSON.stringify(productsList));
+      } catch (e) {
+        console.error("Error saving to localStorage:", e);
+      }
+    }
 
     function setFilter(category, btnElement) {
       currentFilter = category;
@@ -763,10 +784,11 @@
     }
 
     // ==========================================
-    // 2. PRODUCT & IN-MEMORY LOGIC
+    // 2. PRODUCT & LOCALSTORAGE LOGIC
     // ==========================================
     function deleteItem(itemId) {
       productsList = productsList.filter(p => String(p.id) !== String(itemId));
+      saveToLocalStorage();
       displayProducts();
     }
 
@@ -894,6 +916,8 @@
           image: finalImage
         });
 
+        saveToLocalStorage();
+
         document.getElementById('title').value = '';
         document.getElementById('price').value = '';
         document.getElementById('image-url').value = '';
@@ -989,8 +1013,6 @@
     }
 
     window.onload = function() {
-      // Completely wipe any prior local storage data just in case
-      localStorage.clear();
       displayProducts();
     };
   </script>
