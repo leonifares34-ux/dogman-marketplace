@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Dog Man Marketplace</title>
+  <!-- Free Pusher SDK -->
+  <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
   <style>
     body {
       font-family: 'Arial Black', Impact, sans-serif;
@@ -162,6 +164,21 @@
     <h1>🐶 DOG MAN MARKETPLACE 🚨</h1>
   </header>
 
+  <!-- 🎵 LIVE AUDIO PLAYER WIDGET 🎵 -->
+  <div style="background: white; border: 4px solid black; padding: 15px; border-radius: 12px; text-align: center; max-width: 350px; margin: 20px auto; box-shadow: 5px 5px 0px black;">
+    <h3 style="margin-top: 0;">🎵 Live Synced Audio 🎵</h3>
+    
+    <audio id="sync-audio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto"></audio>
+    
+    <button id="audio-play-btn" onclick="toggleAudio()" style="background-color: #0088cc; color: white; border: 3px solid black; padding: 10px 20px; font-size: 1.1em; font-weight: bold; border-radius: 8px; cursor: pointer;">
+      ▶️ Play for Everyone
+    </button>
+    
+    <p id="audio-status" style="font-size: 0.85em; font-weight: bold; margin-top: 10px; color: #555;">
+      Connecting to sync network...
+    </p>
+  </div>
+
   <div class="container">
     <!-- SELLER SECTION -->
     <div class="seller-section">
@@ -170,7 +187,7 @@
       <input type="number" id="price" placeholder="Price ($)" step="0.01" required><br>
       
       <!-- OPTION 1: Image Link -->
-      <input type="text" id="image-url" placeholder="Paste Image URL (https://...)"><br>
+      <input type="text" id="image-url" placeholder="Paste Image URL (https...)"><br>
       
       <div style="font-weight: bold; margin: 4px 0;">— OR —</div>
       
@@ -212,6 +229,67 @@
   <div id="product-container" class="grid"></div>
 
   <script>
+    // ==========================================
+    // 1. PUSHER LIVE AUDIO SYNC SETUP
+    // ==========================================
+    const PUSHER_KEY = "3651c3c833375dea577d";
+    const PUSHER_CLUSTER = "eu";
+
+    const pusher = new Pusher(PUSHER_KEY, {
+      cluster: PUSHER_CLUSTER
+    });
+
+    const channel = pusher.subscribe('audio-room');
+    const audio = document.getElementById('sync-audio');
+    const playBtn = document.getElementById('audio-play-btn');
+    const statusText = document.getElementById('audio-status');
+
+    pusher.connection.bind('connected', () => {
+      statusText.innerText = "Connected! Tap Play to sync.";
+    });
+
+    channel.bind('client-audio-control', function(data) {
+      audio.currentTime = data.time;
+
+      if (data.action === 'play') {
+        audio.play().then(() => {
+          playBtn.innerText = "⏸️ Pause for Everyone";
+          statusText.innerText = "Playing in sync!";
+        }).catch(() => {
+          statusText.innerText = "⚠️ Tap anywhere on screen to allow sound!";
+        });
+      } else if (data.action === 'pause') {
+        audio.pause();
+        playBtn.innerText = "▶️ Play for Everyone";
+        statusText.innerText = "Paused remotely.";
+      }
+    });
+
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play();
+        playBtn.innerText = "⏸️ Pause for Everyone";
+        statusText.innerText = "Broadcasting Play...";
+
+        channel.trigger('client-audio-control', {
+          action: 'play',
+          time: audio.currentTime
+        });
+      } else {
+        audio.pause();
+        playBtn.innerText = "▶️ Play for Everyone";
+        statusText.innerText = "Broadcasting Pause...";
+
+        channel.trigger('client-audio-control', {
+          action: 'pause',
+          time: audio.currentTime
+        });
+      }
+    }
+
+    // ==========================================
+    // 2. LOCALSTORAGE PRODUCT & ORDER LOGIC
+    // ==========================================
     function getProducts() {
       try {
         const data = localStorage.getItem('dogman_products');
