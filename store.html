@@ -392,21 +392,6 @@
     body.dark-mode .buy-btn {
       color: #ffe600;
     }
-    .delete-btn {
-      background-color: #ff3333;
-      color: #2d2d2d;
-      border: 2px solid var(--element-border);
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-weight: bold;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: border-color 0.3s;
-    }
-    body.dark-mode .delete-btn {
-      color: #ffe600;
-    }
-    .delete-btn:hover { background-color: #cc0000; }
     .total-box {
       background-color: #ffcc00;
       color: #2d2d2d;
@@ -885,8 +870,7 @@
             <img src="${imgSrc}" alt="${safeTitle}" onerror="this.src='https://via.placeholder.com/120?text=Invalid+Image'">
             <h4>${safeTitle.length > 25 ? safeTitle.substring(0, 25) + '...' : safeTitle}</h4>
             <div class="price">$${parseFloat(item.price).toFixed(2)}</div>
-            <button class="buy-btn" onclick="quickBuy('${safeTitle}')">Buy Item</button><br>
-            <button class="delete-btn" onclick="deleteItem(${item.id})">Delete Item</button>
+            <button class="buy-btn" onclick="quickBuy('${safeTitle}')">Buy Item</button>
           </div>
         `;
       }).join('');
@@ -939,13 +923,6 @@
         }
         saveProduct(imageUrl);
       }
-    }
-
-    function deleteItem(id) {
-      let products = getProducts();
-      products = products.filter(item => item.id !== id);
-      saveProducts(products);
-      displayProducts();
     }
 
     function quickBuy(itemTitle) {
