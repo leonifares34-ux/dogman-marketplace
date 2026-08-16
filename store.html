@@ -3,44 +3,95 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Store - Algerian Collection</title>
+  <title>Dog Man Marketplace</title>
   
   <style>
-    /* Reset & Base Styles */
-    * {
-      box-sizing: border-box;
+    /* CSS Variables & Theme Setup */
+    :root {
+      --bg-color: #f4f4f9;
+      --text-color: #333;
+      --card-bg: #fff;
+      --element-border: #ccc;
+      --shadow-color: rgba(0, 0, 0, 0.05);
+    }
+
+    body.dark-mode {
+      --bg-color: #1a1a1a;
+      --text-color: #f4f4f9;
+      --card-bg: #2a2a2a;
+      --element-border: #444;
+      --shadow-color: rgba(0, 0, 0, 0.3);
     }
 
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
+      background-color: var(--bg-color);
+      color: var(--text-color);
       margin: 0;
       padding: 20px;
+      transition: background-color 0.3s, color 0.3s;
     }
 
-    /* Store Header & Search */
     header {
       text-align: center;
       padding: 20px;
+      position: relative;
     }
 
-    header h1 {
-      color: #333;
-      margin-bottom: 10px;
+    /* Theme Toggle Button */
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      padding: 8px 12px;
+      background: var(--card-bg);
+      color: var(--text-color);
+      border: 1px solid var(--element-border);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Search & Filter Section */
+    .search-filter-bar {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 25px;
     }
 
     #searchInput {
-      padding: 12px 16px;
+      padding: 10px;
       width: 100%;
       max-width: 350px;
       font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      outline: none;
-      transition: border-color 0.2s;
+      border: 1px solid var(--element-border);
+      border-radius: 4px;
+      background: var(--card-bg);
+      color: var(--text-color);
     }
 
-    #searchInput:focus {
+    .filter-chips {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .filter-chip {
+      padding: 6px 12px;
+      background: var(--card-bg);
+      color: var(--text-color);
+      border: 1px solid var(--element-border);
+      border-radius: 16px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .filter-chip.active {
+      background-color: #ff4757;
+      color: #fff;
       border-color: #ff4757;
     }
 
@@ -50,49 +101,63 @@
       gap: 20px;
       justify-content: center;
       flex-wrap: wrap;
-      margin-top: 30px;
-      max-width: 1000px;
-      margin-left: auto;
-      margin-right: auto;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
     /* Product Card */
     .product-card {
       position: relative;
-      width: 240px;
-      border: 1px solid #e0e0e0;
+      width: 220px;
+      border: 1px solid var(--element-border);
       border-radius: 8px;
-      overflow: hidden; /* Clips the corner ribbon so it stays neatly inside */
-      background: #fff;
+      overflow: hidden;
+      background: var(--card-bg);
       padding: 16px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 6px var(--shadow-color);
+      transition: transform 0.2s ease;
     }
 
     .product-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .id-badge {
+      font-size: 0.75rem;
+      color: #888;
+    }
+
+    .delete-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
     }
 
     .product-card img {
       width: 100%;
-      height: 160px;
+      height: 140px;
       object-fit: cover;
       border-radius: 4px;
-      background-color: #eaeaea;
+      background-color: var(--element-border);
     }
 
     .product-card h3 {
       font-size: 1rem;
-      margin: 12px 0 8px 0;
-      color: #333;
+      margin: 10px 0 6px 0;
     }
 
     .product-card .price {
       font-weight: bold;
       color: #ff4757;
       margin: 0;
-      font-size: 1.1rem;
     }
 
     /* --- HOT RIBBON STYLING --- */
@@ -123,62 +188,252 @@
       transform: rotate(45deg);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
+
+    /* Add Product Form Section */
+    .add-section {
+      max-width: 400px;
+      margin: 40px auto;
+      background: var(--card-bg);
+      padding: 20px;
+      border: 1px solid var(--element-border);
+      border-radius: 8px;
+      box-shadow: 0 4px 6px var(--shadow-color);
+    }
+
+    .add-section h2 {
+      font-size: 1.2rem;
+      margin-top: 0;
+    }
+
+    .add-section input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 12px;
+      box-sizing: border-box;
+      border: 1px solid var(--element-border);
+      border-radius: 4px;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+
+    .add-section button {
+      width: 100%;
+      padding: 10px;
+      background-color: #2ed573;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .add-section button:hover {
+      background-color: #26af5f;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Store Header with Keyword Search Bar -->
+  <!-- Header & Dark Mode Toggle -->
   <header>
-    <h1>My Store</h1>
-    <input type="text" id="searchInput" placeholder="Search (e.g., algeria, algerian, hot)..." onkeyup="filterProducts()">
+    <button class="theme-toggle" onclick="toggleDarkMode()">🌓 Theme</button>
+    <h1>Dog Man Marketplace</h1>
   </header>
 
-  <!-- Product Catalog Grid -->
+  <!-- Search & Category Filters -->
+  <div class="search-filter-bar">
+    <input type="text" id="searchInput" placeholder="Search products (e.g., algeria, algerian, hot)..." onkeyup="filterProducts()">
+    
+    <div class="filter-chips">
+      <button class="filter-chip active" onclick="setCategory('all')">All</button>
+      <button class="filter-chip" onclick="setCategory('hot')">Hot Items</button>
+      <button class="filter-chip" onclick="setCategory('algeria')">Algerian Collection</button>
+    </div>
+  </div>
+
+  <!-- Product Catalog Grid Container -->
   <main class="product-grid" id="productGrid">
-
-    <!-- Product 1 -->
-    <div class="product-card" data-keywords="algeria algerian hot traditional decor">
-      <div class="ribbon hot"><span>Hot</span></div>
-      <img src="https://via.placeholder.com/240x160?text=Algerian+Decor" alt="Algerian Decor">
-      <h3>Algerian Decor Piece</h3>
-      <p class="price">$24.99</p>
-    </div>
-
-    <!-- Product 2 -->
-    <div class="product-card" data-keywords="algeria souvenir craft">
-      <img src="https://via.placeholder.com/240x160?text=Souvenir" alt="Souvenir from Algeria">
-      <h3>Souvenir from Algeria</h3>
-      <p class="price">$15.50</p>
-    </div>
-
-    <!-- Product 3 -->
-    <div class="product-card" data-keywords="algerian hot clothing fashion">
-      <div class="ribbon hot"><span>Hot</span></div>
-      <img src="https://via.placeholder.com/240x160?text=Traditional+Garment" alt="Traditional Algerian Garment">
-      <h3>Traditional Algerian Garment</h3>
-      <p class="price">$45.00</p>
-    </div>
-
+    <!-- Dynamically populated products go here -->
   </main>
 
-  <!-- Live Search Filter Logic -->
+  <!-- Add Product Section -->
+  <section class="add-section">
+    <h2>Add New Product</h2>
+    <input type="text" id="newTitle" placeholder="Product Title (include algeria/algerian if applicable)">
+    <input type="number" id="newPrice" placeholder="Price in DZD" step="0.01">
+    <input type="text" id="newImage" placeholder="Image URL (or local path like images/dogman.jpg)">
+    <button onclick="addProduct()">Add Product</button>
+  </section>
+
+  <!-- Application Logic -->
   <script>
-    function filterProducts() {
-      const query = document.getElementById('searchInput').value.toLowerCase();
-      const products = document.querySelectorAll('.product-card');
+    // Default product inventory
+    const defaultProducts = [
+      { id: 'prod_1', title: 'Algerian Flag & Algeria Souvenir', price: 1250.00, image: 'https://via.placeholder.com/220x140?text=Algerian+Item', category: 'hot' },
+      { id: 'prod_2', title: 'Dog Man Classic Comic', price: 1800.50, image: 'https://via.placeholder.com/220x140?text=Dog+Man', category: 'all' },
+      { id: 'prod_3', title: 'Traditional Algerian Garment', price: 4500.00, image: 'https://via.placeholder.com/220x140?text=Garment', category: 'hot' },
+      { id: 'prod_4', title: 'Petey the Cat Plush', price: 2200.00, image: 'https://via.placeholder.com/220x140?text=Petey', category: 'all' }
+    ];
 
-      products.forEach(product => {
-        const keywords = product.getAttribute('data-keywords').toLowerCase();
-        const textContent = product.innerText.toLowerCase();
+    let productsList = [];
+    let currentFilter = 'all';
 
-        // Matches if search query matches data-keywords or visible text
-        if (keywords.includes(query) || textContent.includes(query)) {
-          product.style.display = 'block';
-        } else {
-          product.style.display = 'none';
+    // Load products from LocalStorage or fallback to defaults
+    function loadProducts() {
+      const saved = localStorage.getItem('dogman_products');
+      if (saved) {
+        try {
+          productsList = JSON.parse(saved);
+        } catch (e) {
+          productsList = [...defaultProducts];
+        }
+      } else {
+        productsList = [...defaultProducts];
+      }
+      displayProducts();
+    }
+
+    function saveProducts() {
+      localStorage.setItem('dogman_products', JSON.stringify(productsList));
+    }
+
+    // Set category filtering chip
+    function setCategory(category) {
+      currentFilter = category;
+      document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.classList.remove('active');
+        if (chip.innerText.toLowerCase().includes(category) || (category === 'all' && chip.innerText === 'All')) {
+          chip.classList.add('active');
         }
       });
+      displayProducts();
     }
+
+    // Toggle Dark Mode UI
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    // Render individual product to HTML string
+    function displayProductToHtml(item) {
+      const safeTitle = escapeHtml(item.title);
+      const safeImg = escapeHtml(item.image);
+      
+      // Determine if hot ribbon should show
+      let hotRibbonHtml = '';
+      if (item.category === 'hot' || safeTitle.toLowerCase().includes('hot')) {
+        hotRibbonHtml = '<div class="ribbon hot"><span>Hot</span></div>';
+      }
+
+      return `
+        <div class="product-card" data-id="${item.id}" data-keywords="${safeTitle.toLowerCase()}">
+          ${hotRibbonHtml}
+          <div class="card-top-bar">
+            <span class="id-badge">${item.id}</span>
+            <button class="delete-btn" onclick="deleteItem('${item.id}')">🗑️</button>
+          </div>
+          <img src="${safeImg}" alt="${safeTitle}">
+          <h3>${safeTitle}</h3>
+          <p class="price">${item.price.toFixed(2)} DZD</p>
+        </div>
+      `;
+    }
+
+    // Display / Filter Products on UI
+    function displayProducts() {
+      const container = document.getElementById('productGrid');
+      const searchInput = document.getElementById('searchInput');
+      const query = searchInput ? searchInput.value.toLowerCase() : '';
+
+      // Filter logic supporting keywords like "algeria", "algerian", and categories
+      const filtered = productsList.filter(item => {
+        const titleText = item.title.toLowerCase();
+        const matchesCategory = currentFilter === 'all' || 
+                                item.category === currentFilter || 
+                                (currentFilter === 'algeria' && (titleText.includes('algeria') || titleText.includes('algerian')));
+        
+        const matchesSearch = titleText.includes(query) || item.id.toLowerCase().includes(query);
+        
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<p style="text-align: center; width: 100%;">No products found matching your search.</p>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(displayProductToHtml).join('');
+    }
+
+    // Live search filter wrapper
+    function filterProducts() {
+      displayProducts();
+    }
+
+    // Add new product from form inputs
+    function addProduct() {
+      const titleInput = document.getElementById('newTitle');
+      const priceInput = document.getElementById('newPrice');
+      const imageInput = document.getElementById('newImage');
+
+      const title = titleInput.value.trim();
+      const price = parseFloat(priceInput.value);
+      const image = imageInput.value.trim() || 'https://via.placeholder.com/220x140?text=New+Item';
+
+      if (!title || isNaN(price)) {
+        alert('Please enter a valid title and price in DZD.');
+        return;
+      }
+
+      // Check keywords automatically for category assignment
+      let category = 'all';
+      const lowerTitle = title.toLowerCase();
+      if (lowerTitle.includes('algeria') || lowerTitle.includes('algerian')) {
+        category = 'algeria';
+      }
+
+      const newId = 'prod_' + Date.now();
+      const newProduct = {
+        id: newId,
+        title: title,
+        price: price,
+        image: image,
+        category: category
+      };
+
+      productsList.push(newProduct);
+      saveProducts();
+      displayProducts();
+
+      // Clear form fields
+      titleInput.value = '';
+      priceInput.value = '';
+      imageInput.value = '';
+    }
+
+    // Delete item with bug-free identifier tracking
+    function deleteItem(id) {
+      productsList = productsList.filter(item => item.id !== id);
+      saveProducts();
+      displayProducts();
+    }
+
+    // Basic HTML escaping utility for safety
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    // Initial render on page load
+    window.onload = function() {
+      loadProducts();
+    };
   </script>
 
 </body>
