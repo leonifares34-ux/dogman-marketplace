@@ -6,18 +6,50 @@
   <!-- Free Pusher SDK -->
   <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
   <style>
+    :root {
+      --bg-color: #ffcc00;
+      --card-bg: #ffffff;
+      --text-color: #000000;
+      --header-bg: #0088cc;
+      --checkout-bg: #0088cc;
+    }
+    body.dark-mode {
+      --bg-color: #1a1a1a;
+      --card-bg: #2a2a2a;
+      --text-color: #ffffff;
+      --header-bg: #333333;
+      --checkout-bg: #222222;
+    }
+
     body {
       font-family: 'Arial Black', Impact, sans-serif;
-      background-color: #ffcc00;
+      background-color: var(--bg-color);
+      color: var(--text-color);
       margin: 0;
       padding: 0;
+      transition: background-color 0.3s, color 0.3s;
     }
     header {
-      background-color: #0088cc;
+      background-color: var(--header-bg);
       color: white;
       padding: 20px;
       text-align: center;
       border-bottom: 5px solid black;
+      position: relative;
+    }
+    .theme-toggle-btn {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background: white;
+      color: black;
+      border: 3px solid black;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 3px 3px 0px black;
+      font-family: inherit;
     }
     .container {
       display: flex;
@@ -29,7 +61,7 @@
       padding: 0 10px;
     }
     .seller-section, .checkout-section {
-      background-color: #ffffff;
+      background-color: var(--card-bg);
       border: 4px solid black;
       box-shadow: 5px 5px 0px black;
       flex: 1;
@@ -39,9 +71,10 @@
       border-radius: 12px;
       text-align: center;
       box-sizing: border-box;
+      transition: background-color 0.3s;
     }
     .checkout-section {
-      background-color: #0088cc;
+      background-color: var(--checkout-bg);
       color: white;
     }
     .seller-section input, .checkout-section input, .checkout-section select, #audio-select {
@@ -152,6 +185,21 @@
       font-weight: bold;
     }
     .seller-btn:hover { background-color: #218838; }
+
+    .reset-btn {
+      background-color: #ff9900;
+      color: white;
+      font-size: 0.9em;
+      border: 3px solid black;
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0px black;
+      margin-top: 8px;
+      font-weight: bold;
+    }
+    .reset-btn:hover { background-color: #cc7a00; }
+
     .order-btn {
       background-color: #ff3333;
       color: white;
@@ -173,9 +221,16 @@
       max-width: 900px;
       padding: 0 15px;
     }
+    .search-row {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
     #search-input {
-      width: 90%;
-      max-width: 500px;
+      width: 65%;
+      min-width: 260px;
       padding: 12px 15px;
       border: 4px solid black;
       border-radius: 10px;
@@ -185,7 +240,22 @@
       box-shadow: 4px 4px 0px black;
       box-sizing: border-box;
       background-color: white;
+      color: black;
     }
+    .surprise-btn {
+      background-color: #9900ff;
+      color: white;
+      border: 4px solid black;
+      padding: 12px 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 4px 4px 0px black;
+      font-size: 1em;
+    }
+    .surprise-btn:hover { background-color: #7a00cc; }
+
     .filter-chips-wrapper {
       margin-top: 12px;
       display: flex;
@@ -223,18 +293,34 @@
     }
     .card {
       background: white;
+      color: black;
       border: 4px solid black;
       border-radius: 12px;
       padding: 15px;
       width: 220px;
       text-align: center;
       box-shadow: 5px 5px 0px black;
+      position: relative;
     }
     .card img {
       max-width: 120px;
       height: 120px;
       object-fit: contain;
     }
+    .ribbon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 4px 8px;
+      font-size: 0.75em;
+      font-weight: bold;
+      border: 2px solid black;
+      border-radius: 6px;
+      box-shadow: 2px 2px 0px black;
+    }
+    .ribbon.hot { background-color: #ff3333; color: white; }
+    .ribbon.new { background-color: #28a745; color: white; }
+
     .price {
       color: #ff3333;
       font-size: 1.3em;
@@ -274,14 +360,15 @@
     }
   </style>
 </head>
-<body>
+<body id="page-body">
 
   <header>
+    <button class="theme-toggle-btn" onclick="toggleDarkMode()">🌙 Night Mode</button>
     <h1>🐶 DOG MAN MARKETPLACE 🚨</h1>
   </header>
 
   <!-- LIVE AUDIO PLAYER WIDGET -->
-  <div style="background: white; border: 4px solid black; padding: 15px; border-radius: 12px; text-align: center; max-width: 380px; margin: 20px auto; box-shadow: 5px 5px 0px black;">
+  <div style="background: var(--card-bg); border: 4px solid black; padding: 15px; border-radius: 12px; text-align: center; max-width: 380px; margin: 20px auto; box-shadow: 5px 5px 0px black;">
     <h3 style="margin-top: 0;">🎵 Live Synced Announcement 🎵</h3>
     
     <select id="audio-select" onchange="changeTrackBroadcast()">
@@ -298,7 +385,7 @@
       ▶️ Play for Everyone
     </button>
     
-    <p id="audio-status" style="font-size: 0.85em; font-weight: bold; margin-top: 10px; color: #555;">
+    <p id="audio-status" style="font-size: 0.85em; font-weight: bold; margin-top: 10px; color: #888;">
       Connecting to sync network...
     </p>
   </div>
@@ -317,12 +404,13 @@
       <label style="font-size: 0.85em; font-weight: bold; display: block;">Upload Image File:</label>
       <input type="file" id="image-file" accept="image/*"><br>
       
-      <button class="seller-btn" onclick="addItem()">List Item!</button>
+      <button class="seller-btn" onclick="addItem()">List Item!</button><br>
+      <button class="reset-btn" onclick="resetDefaultItems()">🔄 Reset Default Items</button>
     </div>
 
     <!-- ORDER SECTION -->
     <div class="checkout-section">
-      <h2>📦 Order & Choose Address 📦</h2>
+      <h2>📦 Order & Choose Address <span id="cart-badge" style="background:#ff3333; color:white; border:2px solid black; padding:2px 6px; border-radius:12px; font-size:0.8em;">(0)</span></h2>
       
       <select id="cust-name" required>
         <option value="" disabled selected>-- Select Your Name --</option>
@@ -406,7 +494,10 @@
 
   <!-- SEARCH & FILTER BAR SECTION -->
   <div class="filter-container">
-    <input type="text" id="search-input" placeholder="🔍 Search items (e.g., Dog Man, Squishy, Purse)..." oninput="displayProducts()">
+    <div class="search-row">
+      <input type="text" id="search-input" placeholder="🔍 Search items (e.g., Dog Man, Squishy, Purse)..." oninput="displayProducts()">
+      <button class="surprise-btn" onclick="surpriseMe()">🎲 Surprise Me!</button>
+    </div>
     <div class="filter-chips-wrapper">
       <button class="filter-chip active" onclick="setFilter('all', this)">All Items</button>
       <button class="filter-chip" onclick="setFilter('Dog Man', this)">Dog Man</button>
@@ -436,6 +527,25 @@
       cardElement.classList.add('selected');
       const radio = cardElement.querySelector('input[type="radio"]');
       if (radio) radio.checked = true;
+    }
+
+    function toggleDarkMode() {
+      const body = document.getElementById('page-body');
+      body.classList.toggle('dark-mode');
+      const btn = document.querySelector('.theme-toggle-btn');
+      if (body.classList.contains('dark-mode')) {
+        btn.innerText = "☀️ Light Mode";
+      } else {
+        btn.innerText = "🌙 Night Mode";
+      }
+    }
+
+    function surpriseMe() {
+      const products = getProducts();
+      if (products.length === 0) return;
+      const randomItem = products[Math.floor(Math.random() * products.length)];
+      document.getElementById('search-input').value = randomItem.title;
+      displayProducts();
     }
 
     // ==========================================
@@ -544,46 +654,46 @@
     // 2. DEFAULT PRODUCTS & STORAGE LOGIC
     // ==========================================
     const defaultProducts = [
-      { id: 1, title: 'Aloha Hawaii Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Aloha+Hawaii' },
-      { id: 2, title: 'If you can dream', price: '5.00', image: 'https://via.placeholder.com/120?text=If+You+Can+Dream' },
-      { id: 3, title: 'Egg Squishy', price: '4.00', image: 'https://via.placeholder.com/120?text=Egg+Squishy' },
-      { id: 4, title: 'Weihnachtsbaum Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Weihnachtsbaum+Purse' },
-      { id: 5, title: 'Blue Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blue+Purse' },
-      { id: 6, title: 'Pink Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Pink+Purse' },
-      { id: 7, title: 'Blatt Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blatt+Purse' },
-      { id: 8, title: 'Moschea Purse', price: '50.00', image: 'https://via.placeholder.com/120?text=Moschea+Purse' },
-      { id: 9, title: 'Small Star Fidget', price: '4.00', image: 'https://via.placeholder.com/120?text=Small+Star+Fidget' },
-      { id: 10, title: 'Big Star Fidget', price: '8.00', image: 'https://via.placeholder.com/120?text=Big+Star+Fidget' },
-      { id: 11, title: 'Sajadah Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Sajadah+Lesezeichen' },
-      { id: 12, title: 'Spezi', price: '5.00', image: 'https://via.placeholder.com/120?text=Spezi' },
-      { id: 13, title: 'Cake Squishy', price: '20.00', image: 'https://via.placeholder.com/120?text=Cake+Squishy' },
-      { id: 14, title: 'Pikachu Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Pikachu+Federtasche' },
-      { id: 15, title: 'Banana Kid Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Banana+Kid+Squishy' },
-      { id: 16, title: 'STW Squishy', price: '50.00', image: 'https://via.placeholder.com/120?text=STW+Squishy' },
-      { id: 17, title: 'Mikey Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Mikey+Squishy' },
-      { id: 18, title: 'JJ Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=JJ+Squishy' },
-      { id: 19, title: 'SERIE A Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=SERIE+A+Squishy' },
-      { id: 20, title: 'QuestionMark Block Squish...', price: '2.00', image: 'https://via.placeholder.com/120?text=QuestionMark+Block' },
-      { id: 21, title: '1up squishy', price: '2.00', image: 'https://via.placeholder.com/120?text=1up+squishy' },
-      { id: 22, title: 'Stitch Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Federtasche' },
-      { id: 23, title: 'Herlitz Freedom Tasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Herlitz+Freedom' },
-      { id: 24, title: 'Crocodile Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Crocodile+Federtasche' },
-      { id: 25, title: 'Stitch Legami Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Legami' },
-      { id: 26, title: 'Gedagedigedaggedo Leseze...', price: '3.00', image: 'https://via.placeholder.com/120?text=Gedagedigedaggedo' },
-      { id: 27, title: 'Cinnamoroll Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Cinnamoroll' },
-      { id: 28, title: 'Egg Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Egg+Lesezeichen' },
-      { id: 29, title: 'Dog Man 12', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+12' },
-      { id: 30, title: 'Dog Man 11', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+11' },
-      { id: 31, title: 'Dog Man 10', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+10' },
-      { id: 32, title: 'Dog Man 9', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+9' },
-      { id: 33, title: 'Dog Man 8', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+8' },
-      { id: 34, title: 'Dog Man 7', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+7' },
-      { id: 35, title: 'Dog Man 6', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+6' },
-      { id: 36, title: 'Dog Man 5', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+5' },
-      { id: 37, title: 'Dog Man 4', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+4' },
-      { id: 38, title: 'Dog Man 3', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+3' },
-      { id: 39, title: 'Dog Man 2', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+2' },
-      { id: 40, title: 'Dog Man 1', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+1' }
+      { id: 1718500000000, title: 'Aloha Hawaii Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Aloha+Hawaii' },
+      { id: 1718500000000, title: 'If you can dream', price: '5.00', image: 'https://via.placeholder.com/120?text=If+You+Can+Dream' },
+      { id: 1718500000000, title: 'Egg Squishy', price: '4.00', image: 'https://via.placeholder.com/120?text=Egg+Squishy' },
+      { id: 1718500000000, title: 'Weihnachtsbaum Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Weihnachtsbaum+Purse' },
+      { id: 1718500000000, title: 'Blue Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blue+Purse' },
+      { id: 1718500000000, title: 'Pink Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Pink+Purse' },
+      { id: 1718500000000, title: 'Blatt Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blatt+Purse' },
+      { id: 1718500000000, title: 'Moschea Purse', price: '50.00', image: 'https://via.placeholder.com/120?text=Moschea+Purse' },
+      { id: 1718500000000, title: 'Small Star Fidget', price: '4.00', image: 'https://via.placeholder.com/120?text=Small+Star+Fidget' },
+      { id: 1718500000000, title: 'Big Star Fidget', price: '8.00', image: 'https://via.placeholder.com/120?text=Big+Star+Fidget' },
+      { id: 1718500000000, title: 'Sajadah Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Sajadah+Lesezeichen' },
+      { id: 1718500000000, title: 'Spezi', price: '5.00', image: 'https://via.placeholder.com/120?text=Spezi' },
+      { id: 1718500000000, title: 'Cake Squishy', price: '20.00', image: 'https://via.placeholder.com/120?text=Cake+Squishy' },
+      { id: 1718500000000, title: 'Pikachu Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Pikachu+Federtasche' },
+      { id: 1718500000000, title: 'Banana Kid Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Banana+Kid+Squishy' },
+      { id: 1718500000000, title: 'STW Squishy', price: '50.00', image: 'https://via.placeholder.com/120?text=STW+Squishy' },
+      { id: 1718500000000, title: 'Mikey Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Mikey+Squishy' },
+      { id: 1718500000000, title: 'JJ Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=JJ+Squishy' },
+      { id: 1718500000000, title: 'SERIE A Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=SERIE+A+Squishy' },
+      { id: 1718500000000, title: 'QuestionMark Block Squish...', price: '2.00', image: 'https://via.placeholder.com/120?text=QuestionMark+Block' },
+      { id: 1718500000000, title: '1up squishy', price: '2.00', image: 'https://via.placeholder.com/120?text=1up+squishy' },
+      { id: 1718500000000, title: 'Stitch Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Federtasche' },
+      { id: 1718500000000, title: 'Herlitz Freedom Tasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Herlitz+Freedom' },
+      { id: 1718500000000, title: 'Crocodile Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Crocodile+Federtasche' },
+      { id: 1718500000000, title: 'Stitch Legami Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Legami' },
+      { id: 1718500000000, title: 'Gedagedigedaggedo Leseze...', price: '3.00', image: 'https://via.placeholder.com/120?text=Gedagedigedaggedo' },
+      { id: 1718500000000, title: 'Cinnamoroll Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Cinnamoroll' },
+      { id: 1718500000000, title: 'Egg Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Egg+Lesezeichen' },
+      { id: 1718500000000, title: 'Dog Man 12', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+12' },
+      { id: 1718500000000, title: 'Dog Man 11', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+11' },
+      { id: 1718500000000, title: 'Dog Man 10', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+10' },
+      { id: 1718500000000, title: 'Dog Man 9', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+9' },
+      { id: 1718500000000, title: 'Dog Man 8', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+8' },
+      { id: 1718500000000, title: 'Dog Man 7', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+7' },
+      { id: 1718500000000, title: 'Dog Man 6', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+6' },
+      { id: 1718500000000, title: 'Dog Man 5', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+5' },
+      { id: 1718500000000, title: 'Dog Man 4', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+4' },
+      { id: 1718500000000, title: 'Dog Man 3', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+3' },
+      { id: 1718500000000, title: 'Dog Man 2', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+2' },
+      { id: 1718500000000, title: 'Dog Man 1', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+1' }
     ];
 
     function getProducts() {
@@ -607,6 +717,13 @@
       }
     }
 
+    function resetDefaultItems() {
+      if (confirm("Are you sure you want to reset back to the default items?")) {
+        localStorage.removeItem('dogman_products');
+        displayProducts();
+      }
+    }
+
     function updateLiveTotal() {
       const products = getProducts();
       const selectedBoxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked');
@@ -620,6 +737,11 @@
       const totalDisplay = document.getElementById('live-total');
       if (totalDisplay) {
         totalDisplay.innerText = `$${total.toFixed(2)}`;
+      }
+
+      const badge = document.getElementById('cart-badge');
+      if (badge) {
+        badge.innerText = `(${selectedBoxes.length})`;
       }
     }
 
@@ -665,7 +787,7 @@
         if (currentFilter === 'all') {
           matchesCategory = true;
         } else if (currentFilter === 'expensive') {
-          matchesCategory = parseFloat(item.price) >= 40;
+          matchesCategory = parseFloat(item.price) >= 20;
         } else {
           matchesCategory = item.title.toLowerCase().includes(currentFilter.toLowerCase());
         }
@@ -674,15 +796,27 @@
       });
 
       if (!filteredProducts || filteredProducts.length === 0) {
-        container.innerHTML = '<p style="color: black; font-weight: bold; font-size: 1.2em;">No matching items found!</p>';
+        container.innerHTML = '<p style="font-weight: bold; font-size: 1.2em;">No matching items found!</p>';
         return;
       }
+
+      const oneAndHalfHoursInMs = 1.5 * 60 * 60 * 1000;
+      const now = Date.now();
 
       container.innerHTML = filteredProducts.map(item => {
         const safeTitle = (item.title || 'Item').replace(/'/g, "\\'").replace(/"/g, '&quot;');
         const imgSrc = item.image || 'https://via.placeholder.com/120?text=No+Image';
+        
+        let ribbonHtml = '';
+        if (item.title.toLowerCase().includes('dog man')) {
+          ribbonHtml = '<div class="ribbon hot">🔥 HOT</div>';
+        } else if (now - item.id < oneAndHalfHoursInMs) {
+          ribbonHtml = '<div class="ribbon new">✨ NEW</div>';
+        }
+
         return `
           <div class="card">
+            ${ribbonHtml}
             <img src="${imgSrc}" alt="${safeTitle}" onerror="this.src='https://via.placeholder.com/120?text=Invalid+Image'">
             <h4>${safeTitle.length > 25 ? safeTitle.substring(0, 25) + '...' : safeTitle}</h4>
             <div class="price">$${parseFloat(item.price).toFixed(2)}</div>
