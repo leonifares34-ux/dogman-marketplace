@@ -310,8 +310,8 @@
 
     <div class="audio-card">
       <h3>🎵 Live Synced Announcement 🎵</h3>
-      <button id="playAudioBtn" class="btn-audio">⏸️ Pause for Everyone</button>
-      <div class="audio-status">Broadcasting Play...</div>
+      <button id="playAudioBtn" class="btn-audio">▶️ Play / Pause Track</button>
+      <div id="audioStatus" class="audio-status">Click to play track...</div>
     </div>
 
     <div class="flex-container">
@@ -391,7 +391,8 @@
 
   </main>
 
-  <audio id="syncAudio" src="sound.mp3" preload="auto"></audio>
+  <!-- Audio source points to your uploaded file -->
+  <audio id="syncAudio" src="kontraa-no-sleep-hiphop-music-473847.mp3" preload="auto" loop></audio>
 
   <script>
     const PUSHER_KEY = '3651c3c833375dea577d';
@@ -399,11 +400,11 @@
     const CHANNEL_NAME = 'dogman-store';
     const EVENT_NAME = 'play-sound';
 
-    // Reads items stored in browser local storage
     let products = JSON.parse(localStorage.getItem('dogman_items')) || [];
 
     const syncAudio = document.getElementById('syncAudio');
     const playAudioBtn = document.getElementById('playAudioBtn');
+    const audioStatus = document.getElementById('audioStatus');
     const productsGrid = document.getElementById('productsGrid');
     const checkboxContainer = document.getElementById('checkboxContainer');
     const totalDisplay = document.getElementById('totalDisplay');
@@ -431,12 +432,19 @@
       if (!isAudioUnlocked) return;
       syncAudio.currentTime = 0;
       syncAudio.play().catch(e => console.error(e));
+      audioStatus.textContent = 'Playing: Kontraa - No Sleep';
     });
 
     playAudioBtn.addEventListener('click', () => {
       unlockAudio();
-      syncAudio.currentTime = 0;
-      syncAudio.play();
+      if (syncAudio.paused) {
+        syncAudio.play().then(() => {
+          audioStatus.textContent = 'Playing: Kontraa - No Sleep';
+        }).catch(e => console.error(e));
+      } else {
+        syncAudio.pause();
+        audioStatus.textContent = 'Paused';
+      }
     });
 
     function renderStore() {
@@ -446,7 +454,6 @@
       checkboxContainer.innerHTML = '';
 
       products.forEach((prod, index) => {
-        // Product Cards Grid
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
@@ -458,7 +465,6 @@
         `;
         productsGrid.appendChild(card);
 
-        // Order Checkbox Item
         const label = document.createElement('label');
         label.className = 'checkbox-item';
         label.innerHTML = `
