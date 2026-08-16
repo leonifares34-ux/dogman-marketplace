@@ -354,10 +354,14 @@
       height: 120px;
       object-fit: contain;
     }
+    .card-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      min-height: 24px;
+    }
     .ribbon {
-      position: absolute;
-      top: 10px;
-      right: 10px;
       padding: 4px 8px;
       font-size: 0.75em;
       font-weight: bold;
@@ -370,6 +374,26 @@
     body.dark-mode .ribbon.hot { color: #ffe600; }
     .ribbon.new { background-color: #28a745; color: #2d2d2d; }
     body.dark-mode .ribbon.new { color: #ffe600; }
+
+    .delete-btn {
+      background: #ff4d4d;
+      color: #2d2d2d;
+      border: 2px solid var(--element-border);
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-size: 0.85em;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 2px 2px 0px var(--element-border);
+      transition: transform 0.1s;
+    }
+    body.dark-mode .delete-btn {
+      color: #ffe600;
+    }
+    .delete-btn:hover {
+      background: #cc0000;
+      transform: scale(1.05);
+    }
 
     .price {
       color: #ff3333;
@@ -702,48 +726,48 @@
     // 2. DEFAULT PRODUCTS & STORAGE LOGIC
     // ==========================================
     const defaultProducts = [
-      { id: 1718500000000, title: 'Algerian Flag Lesezeichen', price: '4.00', image: 'https://via.placeholder.com/120?text=Algerian+Flag' },
-      { id: 1718500000000, title: 'Algerian Mint Tea Squishy', price: '9.00', image: 'https://via.placeholder.com/120?text=Algerian+Mint+Tea' },
-      { id: 1718500000000, title: 'Aloha Hawaii Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Aloha+Hawaii' },
-      { id: 1718500000000, title: 'If you can dream', price: '5.00', image: 'https://via.placeholder.com/120?text=If+You+Can+Dream' },
-      { id: 1718500000000, title: 'Egg Squishy', price: '4.00', image: 'https://via.placeholder.com/120?text=Egg+Squishy' },
-      { id: 1718500000000, title: 'Weihnachtsbaum Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Weihnachtsbaum+Purse' },
-      { id: 1718500000000, title: 'Blue Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blue+Purse' },
-      { id: 1718500000000, title: 'Pink Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Pink+Purse' },
-      { id: 1718500000000, title: 'Blatt Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blatt+Purse' },
-      { id: 1718500000000, title: 'Moschea Purse', price: '50.00', image: 'https://via.placeholder.com/120?text=Moschea+Purse' },
-      { id: 1718500000000, title: 'Small Star Fidget', price: '4.00', image: 'https://via.placeholder.com/120?text=Small+Star+Fidget' },
-      { id: 1718500000000, title: 'Big Star Fidget', price: '8.00', image: 'https://via.placeholder.com/120?text=Big+Star+Fidget' },
-      { id: 1718500000000, title: 'Sajadah Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Sajadah+Lesezeichen' },
-      { id: 1718500000000, title: 'Spezi', price: '5.00', image: 'https://via.placeholder.com/120?text=Spezi' },
-      { id: 1718500000000, title: 'Cake Squishy', price: '20.00', image: 'https://via.placeholder.com/120?text=Cake+Squishy' },
-      { id: 1718500000000, title: 'Pikachu Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Pikachu+Federtasche' },
-      { id: 1718500000000, title: 'Banana Kid Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Banana+Kid+Squishy' },
-      { id: 1718500000000, title: 'STW Squishy', price: '50.00', image: 'https://via.placeholder.com/120?text=STW+Squishy' },
-      { id: 1718500000000, title: 'Mikey Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Mikey+Squishy' },
-      { id: 1718500000000, title: 'JJ Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=JJ+Squishy' },
-      { id: 1718500000000, title: 'SERIE A Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=SERIE+A+Squishy' },
-      { id: 1718500000000, title: 'QuestionMark Block Squish...', price: '2.00', image: 'https://via.placeholder.com/120?text=QuestionMark+Block' },
-      { id: 1718500000000, title: '1up squishy', price: '2.00', image: 'https://via.placeholder.com/120?text=1up+squishy' },
-      { id: 1718500000000, title: 'Stitch Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Federtasche' },
-      { id: 1718500000000, title: 'Herlitz Freedom Tasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Herlitz+Freedom' },
-      { id: 1718500000000, title: 'Crocodile Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Crocodile+Federtasche' },
-      { id: 1718500000000, title: 'Stitch Legami Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Legami' },
-      { id: 1718500000000, title: 'Gedagedigedaggedo Leseze...', price: '3.00', image: 'https://via.placeholder.com/120?text=Gedagedigedaggedo' },
-      { id: 1718500000000, title: 'Cinnamoroll Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Cinnamoroll' },
-      { id: 1718500000000, title: 'Egg Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Egg+Lesezeichen' },
-      { id: 1718500000000, title: 'Dog Man 12', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+12' },
-      { id: 1718500000000, title: 'Dog Man 11', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+11' },
-      { id: 1718500000000, title: 'Dog Man 10', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+10' },
-      { id: 1718500000000, title: 'Dog Man 9', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+9' },
-      { id: 1718500000000, title: 'Dog Man 8', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+8' },
-      { id: 1718500000000, title: 'Dog Man 7', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+7' },
-      { id: 1718500000000, title: 'Dog Man 6', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+6' },
-      { id: 1718500000000, title: 'Dog Man 5', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+5' },
-      { id: 1718500000000, title: 'Dog Man 4', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+4' },
-      { id: 1718500000000, title: 'Dog Man 3', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+3' },
-      { id: 1718500000000, title: 'Dog Man 2', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+2' },
-      { id: 1718500000000, title: 'Dog Man 1', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+1' }
+      { id: 1718500000001, title: 'Algerian Flag Lesezeichen', price: '4.00', image: 'https://via.placeholder.com/120?text=Algerian+Flag' },
+      { id: 1718500000002, title: 'Algerian Mint Tea Squishy', price: '9.00', image: 'https://via.placeholder.com/120?text=Algerian+Mint+Tea' },
+      { id: 1718500000003, title: 'Aloha Hawaii Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Aloha+Hawaii' },
+      { id: 1718500000004, title: 'If you can dream', price: '5.00', image: 'https://via.placeholder.com/120?text=If+You+Can+Dream' },
+      { id: 1718500000005, title: 'Egg Squishy', price: '4.00', image: 'https://via.placeholder.com/120?text=Egg+Squishy' },
+      { id: 1718500000006, title: 'Weihnachtsbaum Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Weihnachtsbaum+Purse' },
+      { id: 1718500000007, title: 'Blue Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blue+Purse' },
+      { id: 1718500000008, title: 'Pink Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Pink+Purse' },
+      { id: 1718500000009, title: 'Blatt Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blatt+Purse' },
+      { id: 1718500000010, title: 'Moschea Purse', price: '50.00', image: 'https://via.placeholder.com/120?text=Moschea+Purse' },
+      { id: 1718500000011, title: 'Small Star Fidget', price: '4.00', image: 'https://via.placeholder.com/120?text=Small+Star+Fidget' },
+      { id: 1718500000012, title: 'Big Star Fidget', price: '8.00', image: 'https://via.placeholder.com/120?text=Big+Star+Fidget' },
+      { id: 1718500000013, title: 'Sajadah Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Sajadah+Lesezeichen' },
+      { id: 1718500000014, title: 'Spezi', price: '5.00', image: 'https://via.placeholder.com/120?text=Spezi' },
+      { id: 1718500000015, title: 'Cake Squishy', price: '20.00', image: 'https://via.placeholder.com/120?text=Cake+Squishy' },
+      { id: 1718500000016, title: 'Pikachu Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Pikachu+Federtasche' },
+      { id: 1718500000017, title: 'Banana Kid Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Banana+Kid+Squishy' },
+      { id: 1718500000018, title: 'STW Squishy', price: '50.00', image: 'https://via.placeholder.com/120?text=STW+Squishy' },
+      { id: 1718500000019, title: 'Mikey Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Mikey+Squishy' },
+      { id: 1718500000020, title: 'JJ Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=JJ+Squishy' },
+      { id: 1718500000021, title: 'SERIE A Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=SERIE+A+Squishy' },
+      { id: 1718500000022, title: 'QuestionMark Block Squish...', price: '2.00', image: 'https://via.placeholder.com/120?text=QuestionMark+Block' },
+      { id: 1718500000023, title: '1up squishy', price: '2.00', image: 'https://via.placeholder.com/120?text=1up+squishy' },
+      { id: 1718500000024, title: 'Stitch Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Federtasche' },
+      { id: 1718500000025, title: 'Herlitz Freedom Tasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Herlitz+Freedom' },
+      { id: 1718500000026, title: 'Crocodile Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Crocodile+Federtasche' },
+      { id: 1718500000027, title: 'Stitch Legami Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Legami' },
+      { id: 1718500000028, title: 'Gedagedigedaggedo Leseze...', price: '3.00', image: 'https://via.placeholder.com/120?text=Gedagedigedaggedo' },
+      { id: 1718500000029, title: 'Cinnamoroll Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Cinnamoroll' },
+      { id: 1718500000030, title: 'Egg Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Egg+Lesezeichen' },
+      { id: 1718500000031, title: 'Dog Man 12', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+12' },
+      { id: 1718500000032, title: 'Dog Man 11', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+11' },
+      { id: 1718500000033, title: 'Dog Man 10', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+10' },
+      { id: 1718500000034, title: 'Dog Man 9', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+9' },
+      { id: 1718500000035, title: 'Dog Man 8', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+8' },
+      { id: 1718500000036, title: 'Dog Man 7', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+7' },
+      { id: 1718500000037, title: 'Dog Man 6', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+6' },
+      { id: 1718500000038, title: 'Dog Man 5', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+5' },
+      { id: 1718500000039, title: 'Dog Man 4', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+4' },
+      { id: 1718500000040, title: 'Dog Man 3', price: '11.00', image: 'https://via.placeholder.com/120`?text=Dog+Man+3' },
+      { id: 1718500000041, title: 'Dog Man 2', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+2' },
+      { id: 1718500000042, title: 'Dog Man 1', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+1' }
     ];
 
     function getProducts() {
@@ -774,13 +798,20 @@
       }
     }
 
+    function deleteItem(itemId) {
+      let products = getProducts();
+      products = products.filter(p => p.id !== itemId);
+      saveProducts(products);
+      displayProducts();
+    }
+
     function updateLiveTotal() {
       const products = getProducts();
       const selectedBoxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked');
       let total = 0;
 
       selectedBoxes.forEach(cb => {
-        const product = products.find(p => p.title === cb.value);
+        const product = products.find(p => p.id == cb.value);
         if (product) total += parseFloat(product.price) || 0;
       });
 
@@ -805,14 +836,14 @@
         return;
       }
 
-      const checkedTitles = Array.from(document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked'))
-                                 .map(cb => cb.value);
+      const checkedIds = Array.from(document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked'))
+                              .map(cb => cb.value);
 
       container.innerHTML = products.map((item, index) => {
-        const isChecked = checkedTitles.includes(item.title) ? 'checked' : '';
+        const isChecked = checkedIds.includes(String(item.id)) ? 'checked' : '';
         return `
           <div class="item-checkbox-row">
-            <input type="checkbox" id="item-check-${index}" value="${item.title}" ${isChecked} onchange="updateLiveTotal()">
+            <input type="checkbox" id="item-check-${index}" value="${item.id}" ${isChecked} onchange="updateLiveTotal()">
             <label for="item-check-${index}">${item.title} ($${parseFloat(item.price).toFixed(2)})</label>
           </div>
         `;
@@ -866,11 +897,14 @@
 
         return `
           <div class="card">
-            ${ribbonHtml}
+            <div class="card-top-bar">
+              ${ribbonHtml}
+              <button class="delete-btn" onclick="deleteItem(${item.id})" title="Delete Item">🗑️</button>
+            </div>
             <img src="${imgSrc}" alt="${safeTitle}" onerror="this.src='https://via.placeholder.com/120?text=Invalid+Image'">
             <h4>${safeTitle.length > 25 ? safeTitle.substring(0, 25) + '...' : safeTitle}</h4>
             <div class="price">$${parseFloat(item.price).toFixed(2)}</div>
-            <button class="buy-btn" onclick="quickBuy('${safeTitle}')">Buy Item</button>
+            <button class="buy-btn" onclick="quickBuy(${item.id})">Buy Item</button>
           </div>
         `;
       }).join('');
@@ -925,10 +959,10 @@
       }
     }
 
-    function quickBuy(itemTitle) {
+    function quickBuy(itemId) {
       const checkboxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]');
       checkboxes.forEach(cb => {
-        if (cb.value === itemTitle) {
+        if (cb.value == itemId) {
           cb.checked = true;
         }
       });
@@ -952,11 +986,10 @@
       let totalPrice = 0;
 
       selectedBoxes.forEach(cb => {
-        const itemTitle = cb.value;
-        selectedItems.push(itemTitle);
-
-        const foundProduct = products.find(p => p.title === itemTitle);
+        const itemId = cb.value;
+        const foundProduct = products.find(p => p.id == itemId);
         if (foundProduct) {
+          selectedItems.push(foundProduct.title);
           totalPrice += parseFloat(foundProduct.price) || 0;
         }
       });
