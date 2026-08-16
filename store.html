@@ -568,6 +568,53 @@
   <script>
     let currentFilter = 'all';
 
+    // In-memory array ONLY (No local storage persistence)
+    let productsList = [
+      { id: 'def_1', title: 'Algerian Flag Lesezeichen', price: '4.00', image: 'https://via.placeholder.com/120?text=Algerian+Flag' },
+      { id: 'def_2', title: 'Algerian Mint Tea Squishy', price: '9.00', image: 'https://via.placeholder.com/120?text=Algerian+Mint+Tea' },
+      { id: 'def_3', title: 'Aloha Hawaii Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Aloha+Hawaii' },
+      { id: 'def_4', title: 'If you can dream', price: '5.00', image: 'https://via.placeholder.com/120?text=If+You+Can+Dream' },
+      { id: 'def_5', title: 'Egg Squishy', price: '4.00', image: 'https://via.placeholder.com/120?text=Egg+Squishy' },
+      { id: 'def_6', title: 'Weihnachtsbaum Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Weihnachtsbaum+Purse' },
+      { id: 'def_7', title: 'Blue Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blue+Purse' },
+      { id: 'def_8_a', title: 'Pink Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Pink+Purse+1' },
+      { id: 'def_8_b', title: 'Pink Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Pink+Purse+2' },
+      { id: 'def_9', title: 'Blatt Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blatt+Purse' },
+      { id: 'def_10', title: 'Moschea Purse', price: '50.00', image: 'https://via.placeholder.com/120?text=Moschea+Purse' },
+      { id: 'def_11', title: 'Small Star Fidget', price: '4.00', image: 'https://via.placeholder.com/120?text=Small+Star+Fidget' },
+      { id: 'def_12', title: 'Big Star Fidget', price: '8.00', image: 'https://via.placeholder.com/120?text=Big+Star+Fidget' },
+      { id: 'def_13', title: 'Sajadah Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Sajadah+Lesezeichen' },
+      { id: 'def_14', title: 'Spezi', price: '5.00', image: 'https://via.placeholder.com/120?text=Spezi' },
+      { id: 'def_15', title: 'Cake Squishy', price: '20.00', image: 'https://via.placeholder.com/120?text=Cake+Squishy' },
+      { id: 'def_16', title: 'Pikachu Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Pikachu+Federtasche' },
+      { id: 'def_17', title: 'Banana Kid Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Banana+Kid+Squishy' },
+      { id: 'def_18', title: 'STW Squishy', price: '50.00', image: 'https://via.placeholder.com/120?text=STW+Squishy' },
+      { id: 'def_19', title: 'Mikey Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Mikey+Squishy' },
+      { id: 'def_20', title: 'JJ Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=JJ+Squishy' },
+      { id: 'def_21', title: 'SERIE A Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=SERIE+A+Squishy' },
+      { id: 'def_22', title: 'QuestionMark Block Squish...', price: '2.00', image: 'https://via.placeholder.com/120?text=QuestionMark+Block' },
+      { id: 'def_23', title: '1up squishy', price: '2.00', image: 'https://via.placeholder.com/120?text=1up+squishy' },
+      { id: 'def_24', title: 'Stitch Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Federtasche' },
+      { id: 'def_25', title: 'Herlitz Freedom Tasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Herlitz+Freedom' },
+      { id: 'def_26', title: 'Crocodile Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Crocodile+Federtasche' },
+      { id: 'def_27', title: 'Stitch Legami Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Legami' },
+      { id: 'def_28', title: 'Gedagedigedaggedo Leseze...', price: '3.00', image: 'https://via.placeholder.com/120?text=Gedagedigedaggedo' },
+      { id: 'def_29', title: 'Cinnamoroll Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Cinnamoroll' },
+      { id: 'def_30', title: 'Egg Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Egg+Lesezeichen' },
+      { id: 'def_31', title: 'Dog Man 12', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+12' },
+      { id: 'def_32', title: 'Dog Man 11', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+11' },
+      { id: 'def_33', title: 'Dog Man 10', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+10' },
+      { id: 'def_34', title: 'Dog Man 9', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+9' },
+      { id: 'def_35', title: 'Dog Man 8', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+8' },
+      { id: 'def_36', title: 'Dog Man 7', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+7' },
+      { id: 'def_37', title: 'Dog Man 6', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+6' },
+      { id: 'def_38', title: 'Dog Man 5', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+5' },
+      { id: 'def_39', title: 'Dog Man 4', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+4' },
+      { id: 'def_40', title: 'Dog Man 3', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+3' },
+      { id: 'def_41', title: 'Dog Man 2', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+2' },
+      { id: 'def_42', title: 'Dog Man 1', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+1' }
+    ];
+
     function setFilter(category, btnElement) {
       currentFilter = category;
       document.querySelectorAll('.filter-chip').forEach(btn => btn.classList.remove('active'));
@@ -594,9 +641,8 @@
     }
 
     function surpriseMe() {
-      const products = getProducts();
-      if (products.length === 0) return;
-      const randomItem = products[Math.floor(Math.random() * products.length)];
+      if (productsList.length === 0) return;
+      const randomItem = productsList[Math.floor(Math.random() * productsList.length)];
       document.getElementById('search-input').value = randomItem.title;
       displayProducts();
     }
@@ -717,94 +763,19 @@
     }
 
     // ==========================================
-    // 2. DEFAULT PRODUCTS & STORAGE LOGIC
+    // 2. PRODUCT & IN-MEMORY LOGIC
     // ==========================================
-    const defaultProducts = [
-      { id: 'def_1', title: 'Algerian Flag Lesezeichen', price: '4.00', image: 'https://via.placeholder.com/120?text=Algerian+Flag' },
-      { id: 'def_2', title: 'Algerian Mint Tea Squishy', price: '9.00', image: 'https://via.placeholder.com/120?text=Algerian+Mint+Tea' },
-      { id: 'def_3', title: 'Aloha Hawaii Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Aloha+Hawaii' },
-      { id: 'def_4', title: 'If you can dream', price: '5.00', image: 'https://via.placeholder.com/120?text=If+You+Can+Dream' },
-      { id: 'def_5', title: 'Egg Squishy', price: '4.00', image: 'https://via.placeholder.com/120?text=Egg+Squishy' },
-      { id: 'def_6', title: 'Weihnachtsbaum Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Weihnachtsbaum+Purse' },
-      { id: 'def_7', title: 'Blue Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blue+Purse' },
-      { id: 'def_8_a', title: 'Pink Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Pink+Purse+1' },
-      { id: 'def_8_b', title: 'Pink Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Pink+Purse+2' },
-      { id: 'def_9', title: 'Blatt Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blatt+Purse' },
-      { id: 'def_10', title: 'Moschea Purse', price: '50.00', image: 'https://via.placeholder.com/120?text=Moschea+Purse' },
-      { id: 'def_11', title: 'Small Star Fidget', price: '4.00', image: 'https://via.placeholder.com/120?text=Small+Star+Fidget' },
-      { id: 'def_12', title: 'Big Star Fidget', price: '8.00', image: 'https://via.placeholder.com/120?text=Big+Star+Fidget' },
-      { id: 'def_13', title: 'Sajadah Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Sajadah+Lesezeichen' },
-      { id: 'def_14', title: 'Spezi', price: '5.00', image: 'https://via.placeholder.com/120?text=Spezi' },
-      { id: 'def_15', title: 'Cake Squishy', price: '20.00', image: 'https://via.placeholder.com/120?text=Cake+Squishy' },
-      { id: 'def_16', title: 'Pikachu Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Pikachu+Federtasche' },
-      { id: 'def_17', title: 'Banana Kid Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Banana+Kid+Squishy' },
-      { id: 'def_18', title: 'STW Squishy', price: '50.00', image: 'https://via.placeholder.com/120?text=STW+Squishy' },
-      { id: 'def_19', title: 'Mikey Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Mikey+Squishy' },
-      { id: 'def_20', title: 'JJ Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=JJ+Squishy' },
-      { id: 'def_21', title: 'SERIE A Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=SERIE+A+Squishy' },
-      { id: 'def_22', title: 'QuestionMark Block Squish...', price: '2.00', image: 'https://via.placeholder.com/120?text=QuestionMark+Block' },
-      { id: 'def_23', title: '1up squishy', price: '2.00', image: 'https://via.placeholder.com/120?text=1up+squishy' },
-      { id: 'def_24', title: 'Stitch Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Federtasche' },
-      { id: 'def_25', title: 'Herlitz Freedom Tasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Herlitz+Freedom' },
-      { id: 'def_26', title: 'Crocodile Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Crocodile+Federtasche' },
-      { id: 'def_27', title: 'Stitch Legami Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Legami' },
-      { id: 'def_28', title: 'Gedagedigedaggedo Leseze...', price: '3.00', image: 'https://via.placeholder.com/120?text=Gedagedigedaggedo' },
-      { id: 'def_29', title: 'Cinnamoroll Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Cinnamoroll' },
-      { id: 'def_30', title: 'Egg Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Egg+Lesezeichen' },
-      { id: 'def_31', title: 'Dog Man 12', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+12' },
-      { id: 'def_32', title: 'Dog Man 11', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+11' },
-      { id: 'def_33', title: 'Dog Man 10', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+10' },
-      { id: 'def_34', title: 'Dog Man 9', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+9' },
-      { id: 'def_35', title: 'Dog Man 8', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+8' },
-      { id: 'def_36', title: 'Dog Man 7', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+7' },
-      { id: 'def_37', title: 'Dog Man 6', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+6' },
-      { id: 'def_38', title: 'Dog Man 5', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+5' },
-      { id: 'def_39', title: 'Dog Man 4', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+4' },
-      { id: 'def_40', title: 'Dog Man 3', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+3' },
-      { id: 'def_41', title: 'Dog Man 2', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+2' },
-      { id: 'def_42', title: 'Dog Man 1', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+1' }
-    ];
-
-    function getProducts() {
-      try {
-        const data = localStorage.getItem('dogman_products');
-        if (data) {
-          const parsed = JSON.parse(data);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            return parsed.map((item, idx) => ({
-              ...item,
-              id: item.id || `item_${idx}_${Date.now()}`
-            }));
-          }
-        }
-      } catch (e) {
-        localStorage.removeItem('dogman_products');
-      }
-      return defaultProducts;
-    }
-
-    function saveProducts(products) {
-      try {
-        localStorage.setItem('dogman_products', JSON.stringify(products));
-      } catch (e) {
-        alert("Image file size is too big! Please paste an Image Link (https://) instead.");
-      }
-    }
-
     function deleteItem(itemId) {
-      let products = getProducts();
-      products = products.filter(p => String(p.id) !== String(itemId));
-      saveProducts(products);
+      productsList = productsList.filter(p => String(p.id) !== String(itemId));
       displayProducts();
     }
 
     function updateLiveTotal() {
-      const products = getProducts();
       const selectedBoxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked');
       let total = 0;
 
       selectedBoxes.forEach(cb => {
-        const product = products.find(p => String(p.id) === String(cb.value));
+        const product = productsList.find(p => String(p.id) === String(cb.value));
         if (product) total += parseFloat(product.price) || 0;
       });
 
@@ -819,11 +790,11 @@
       }
     }
 
-    function updateItemCheckboxes(products) {
+    function updateItemCheckboxes() {
       const container = document.getElementById('item-checkboxes');
       if (!container) return;
 
-      if (!products || products.length === 0) {
+      if (!productsList || productsList.length === 0) {
         container.innerHTML = '<p style="margin: 0; color: gray;">No items available.</p>';
         updateLiveTotal();
         return;
@@ -832,7 +803,7 @@
       const checkedIds = Array.from(document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked'))
                               .map(cb => cb.value);
 
-      container.innerHTML = products.map((item) => {
+      container.innerHTML = productsList.map((item) => {
         const uniqueId = item.id;
         const isChecked = checkedIds.includes(String(uniqueId)) ? 'checked' : '';
         return `
@@ -850,12 +821,11 @@
       const container = document.getElementById('product-container');
       if (!container) return;
 
-      const products = getProducts();
-      updateItemCheckboxes(products);
+      updateItemCheckboxes();
 
       const searchQuery = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
 
-      const filteredProducts = products.filter((item) => {
+      const filteredProducts = productsList.filter((item) => {
         const matchesSearch = item.title.toLowerCase().includes(searchQuery);
         
         let matchesCategory = true;
@@ -917,15 +887,12 @@
       }
 
       function saveProduct(finalImage) {
-        const products = getProducts();
-        products.unshift({
+        productsList.unshift({
           id: 'custom_' + Date.now(),
           title: title,
           price: price,
           image: finalImage
         });
-
-        saveProducts(products);
 
         document.getElementById('title').value = '';
         document.getElementById('price').value = '';
@@ -971,13 +938,12 @@
         return;
       }
 
-      const products = getProducts();
       const selectedItems = [];
       let totalPrice = 0;
 
       selectedBoxes.forEach(cb => {
         const itemId = cb.value;
-        const foundProduct = products.find(p => String(p.id) === String(itemId));
+        const foundProduct = productsList.find(p => String(p.id) === String(itemId));
         if (foundProduct) {
           selectedItems.push(foundProduct.title);
           totalPrice += parseFloat(foundProduct.price) || 0;
@@ -1023,11 +989,8 @@
     }
 
     window.onload = function() {
-      // Force clean any broken local storage cache
-      if (!localStorage.getItem('dogman_clean_reset_v4')) {
-        localStorage.removeItem('dogman_products');
-        localStorage.setItem('dogman_clean_reset_v4', 'true');
-      }
+      // Completely wipe any prior local storage data just in case
+      localStorage.clear();
       displayProducts();
     };
   </script>
