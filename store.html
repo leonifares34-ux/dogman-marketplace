@@ -28,7 +28,7 @@
       max-width: 1100px;
       padding: 0 10px;
     }
-    .seller-section, .checkout-section, .queue-section {
+    .seller-section, .checkout-section {
       background-color: #ffffff;
       border: 4px solid black;
       box-shadow: 5px 5px 0px black;
@@ -43,12 +43,6 @@
     .checkout-section {
       background-color: #0088cc;
       color: white;
-    }
-    .queue-section {
-      background-color: #ffcc00;
-      max-width: 1000px;
-      width: 90%;
-      margin: 20px auto 0 auto;
     }
     .seller-section input, .checkout-section input, .checkout-section select, #audio-select {
       width: 90%;
@@ -174,43 +168,6 @@
       font-weight: bold;
       box-sizing: border-box;
     }
-    /* QUEUE CARDS STYLING */
-    .queue-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      justify-content: center;
-      margin-top: 15px;
-    }
-    .queue-card {
-      background: white;
-      border: 3px solid black;
-      border-radius: 8px;
-      padding: 10px 15px;
-      box-shadow: 3px 3px 0px black;
-      min-width: 200px;
-      text-align: left;
-    }
-    .queue-card h4 {
-      margin: 0 0 5px 0;
-      color: #0088cc;
-    }
-    .queue-card p {
-      margin: 3px 0;
-      font-size: 0.9em;
-    }
-    .finish-btn {
-      background-color: #28a745;
-      color: white;
-      border: 2px solid black;
-      border-radius: 4px;
-      padding: 4px 8px;
-      font-size: 0.8em;
-      cursor: pointer;
-      font-weight: bold;
-      margin-top: 8px;
-      width: 100%;
-    }
   </style>
 </head>
 <body>
@@ -223,7 +180,7 @@
   <div style="background: white; border: 4px solid black; padding: 15px; border-radius: 12px; text-align: center; max-width: 380px; margin: 20px auto; box-shadow: 5px 5px 0px black;">
     <h3 style="margin-top: 0;">🎵 Live Synced Announcement 🎵</h3>
     
-    <!-- Audio File Select Dropdown -->
+    <!-- Custom Track List Select -->
     <select id="audio-select" onchange="changeTrackBroadcast()">
       <option value="kontraa-no-sleep-hiphop-music-473847.mp3">kontraa no sleep</option>
       <option value="XENOGENESIS.mp3">xenogenesis</option>
@@ -232,7 +189,7 @@
       <option value="alex-morgan-calm-still-water-breathing-578483.mp3">calm</option>
     </select><br>
 
-    <audio id="sync-audio" src="audio1.mp3" preload="auto"></audio>
+    <audio id="sync-audio" src="kontraa-no-sleep-hiphop-music-473847.mp3" preload="auto" onended="handleTrackEnd()"></audio>
     
     <button id="audio-play-btn" onclick="toggleAudio()" style="background-color: #0088cc; color: white; border: 3px solid black; padding: 10px 20px; font-size: 1.1em; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 8px;">
       ▶️ Play for Everyone
@@ -241,14 +198,6 @@
     <p id="audio-status" style="font-size: 0.85em; font-weight: bold; margin-top: 10px; color: #555;">
       Connecting to sync network...
     </p>
-  </div>
-
-  <!-- 📋 LIVE ORDER QUEUE SECTION 📋 -->
-  <div class="queue-section">
-    <h2>📋 Live Order Queue 📋</h2>
-    <div id="queue-container" class="queue-list">
-      <p style="margin: 0; color: black; font-weight: bold;">No active orders in queue.</p>
-    </div>
   </div>
 
   <div class="container">
@@ -307,7 +256,7 @@
 
   <script>
     // ==========================================
-    // 1. PUSHER LIVE SYNC SETUP (AUDIO + QUEUE)
+    // 1. PUSHER LIVE SYNC SETUP (AUDIO)
     // ==========================================
     const PUSHER_KEY = "3651c3c833375dea577d";
     const PUSHER_CLUSTER = "eu";
@@ -348,21 +297,6 @@
       }
     });
 
-    // QUEUE SYNC EVENTS
-    channel.bind('client-new-order', function(orderData) {
-      const queue = getQueue();
-      queue.push(orderData);
-      saveQueue(queue);
-      displayQueue();
-    });
-
-    channel.bind('client-complete-order', function(data) {
-      let queue = getQueue();
-      queue = queue.filter(o => o.id !== data.id);
-      saveQueue(queue);
-      displayQueue();
-    });
-
     function changeTrackBroadcast() {
       audio.src = audioSelect.value;
       audio.currentTime = 0;
@@ -401,57 +335,31 @@
       }
     }
 
-    // ==========================================
-    // 2. ORDER QUEUE LOGIC
-    // ==========================================
-    function getQueue() {
-      try {
-        const data = localStorage.getItem('dogman_order_queue');
-        return data ? JSON.parse(data) : [];
-      } catch (e) {
-        localStorage.removeItem('dogman_order_queue');
-        return [];
-      }
-    }
+    // Auto-advance loop handler
+    function handleTrackEnd() {
+      let currentIndex = audioSelect.selectedIndex;
+      let nextIndex = (currentIndex + 1) % audioSelect.options.length;
+      
+      audioSelect.selectedIndex = nextIndex;
+      audio.src = audioSelect.value;
+      audio.currentTime = 0;
 
-    function saveQueue(queue) {
-      try {
-        localStorage.setItem('dogman_order_queue', JSON.stringify(queue));
-      } catch (e) {}
-    }
+      audio.play().then(() => {
+        playBtn.innerText = "⏸️ Pause for Everyone";
+        statusText.innerText = "Playing next track!";
 
-    function displayQueue() {
-      const container = document.getElementById('queue-container');
-      if (!container) return;
-
-      const queue = getQueue();
-
-      if (!queue || queue.length === 0) {
-        container.innerHTML = '<p style="margin: 0; color: black; font-weight: bold;">No active orders in queue.</p>';
-        return;
-      }
-
-      container.innerHTML = queue.map((order, index) => `
-        <div class="queue-card">
-          <h4>#${index + 1} - ${order.customer}</h4>
-          <p><strong>Total:</strong> ${order.total}</p>
-          <p><strong>Address:</strong> ${order.address}</p>
-          <button class="finish-btn" onclick="completeOrder(${order.id})">Mark Completed</button>
-        </div>
-      `).join('');
-    }
-
-    function completeOrder(orderId) {
-      let queue = getQueue();
-      queue = queue.filter(o => o.id !== orderId);
-      saveQueue(queue);
-      displayQueue();
-
-      channel.trigger('client-complete-order', { id: orderId });
+        channel.trigger('client-audio-control', {
+          action: 'play',
+          time: 0,
+          track: audioSelect.value
+        });
+      }).catch(() => {
+        statusText.innerText = "⚠️ Tap anywhere on screen to allow sound!";
+      });
     }
 
     // ==========================================
-    // 3. DEFAULT PRODUCTS & STORAGE LOGIC
+    // 2. DEFAULT PRODUCTS & STORAGE LOGIC
     // ==========================================
     const defaultProducts = [
       { id: 1, title: 'Aloha Hawaii Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Aloha+Hawaii' },
@@ -675,13 +583,6 @@
       const formattedTotal = `$${totalPrice.toFixed(2)}`;
       const FORMSPREE_URL = "https://formspree.io/f/maewbvzr";
 
-      const orderData = {
-        id: Date.now(),
-        customer: customer,
-        total: formattedTotal,
-        address: address
-      };
-
       fetch(FORMSPREE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -697,15 +598,6 @@
         if (res.ok) {
           alert(`Order sent successfully! (${selectedItems.length} items ordered for ${formattedTotal})`);
 
-          // Add to local queue
-          const queue = getQueue();
-          queue.push(orderData);
-          saveQueue(queue);
-          displayQueue();
-
-          // Broadcast to connected users via Pusher
-          channel.trigger('client-new-order', orderData);
-
           document.getElementById('cust-name').selectedIndex = 0;
           document.getElementById('cust-address').selectedIndex = 0;
           document.querySelectorAll('#item-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
@@ -719,7 +611,6 @@
 
     window.onload = function() {
       displayProducts();
-      displayQueue();
     };
   </script>
 
