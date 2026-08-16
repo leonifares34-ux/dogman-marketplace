@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Dog Man Marketplace</title>
+  <!-- Free Pusher SDK -->
   <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
   <style>
     body {
@@ -155,6 +156,18 @@
       margin-top: 10px;
     }
     .delete-btn:hover { background-color: #cc0000; }
+    .total-box {
+      background-color: #ffcc00;
+      color: black;
+      border: 3px solid black;
+      border-radius: 6px;
+      padding: 8px;
+      width: 90%;
+      margin: 10px auto;
+      font-size: 1.1em;
+      font-weight: bold;
+      box-sizing: border-box;
+    }
   </style>
 </head>
 <body>
@@ -163,9 +176,11 @@
     <h1>🐶 DOG MAN MARKETPLACE 🚨</h1>
   </header>
 
+  <!-- 🎵 LIVE AUDIO PLAYER WIDGET 🎵 -->
   <div style="background: white; border: 4px solid black; padding: 15px; border-radius: 12px; text-align: center; max-width: 350px; margin: 20px auto; box-shadow: 5px 5px 0px black;">
     <h3 style="margin-top: 0;">🎵 Live Synced Announcement 🎵</h3>
     
+    <!-- Audio File Link -->
     <audio id="sync-audio" src="b034f43a-696b-4271-b845-d780ccff45aa.wav" preload="auto"></audio>
     
     <button id="audio-play-btn" onclick="toggleAudio()" style="background-color: #0088cc; color: white; border: 3px solid black; padding: 10px 20px; font-size: 1.1em; font-weight: bold; border-radius: 8px; cursor: pointer;">
@@ -178,21 +193,25 @@
   </div>
 
   <div class="container">
+    <!-- SELLER SECTION -->
     <div class="seller-section">
       <h2>⚡ Sell Supa Merch ⚡</h2>
       <input type="text" id="title" placeholder="Item Name (e.g., Supa Buddy Pin)" required><br>
       <input type="number" id="price" placeholder="Price ($)" step="0.01" required><br>
       
+      <!-- OPTION 1: Image Link -->
       <input type="text" id="image-url" placeholder="Paste Image URL (https...)"><br>
       
       <div style="font-weight: bold; margin: 4px 0;">— OR —</div>
       
+      <!-- OPTION 2: File Upload -->
       <label style="font-size: 0.85em; font-weight: bold; display: block;">Upload Image File:</label>
       <input type="file" id="image-file" accept="image/*"><br>
       
       <button class="seller-btn" onclick="addItem()">List Item!</button>
     </div>
 
+    <!-- ORDER SECTION -->
     <div class="checkout-section">
       <h2>📦 Order & Choose Address 📦</h2>
       
@@ -207,6 +226,11 @@
       <div style="font-weight: bold; margin-top: 5px;">Select Items to Order:</div>
       <div id="item-checkboxes" class="item-checkbox-container">
         <p style="margin: 0; color: gray;">No items listed yet.</p>
+      </div>
+
+      <!-- Live Total Display Box -->
+      <div class="total-box">
+        Total Amount: <span id="live-total">$0.00</span>
       </div>
 
       <select id="cust-address" required>
@@ -302,21 +326,40 @@
       }
     }
 
+    function updateLiveTotal() {
+      const products = getProducts();
+      const selectedBoxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked');
+      let total = 0;
+
+      selectedBoxes.forEach(cb => {
+        const product = products.find(p => p.title === cb.value);
+        if (product) total += parseFloat(product.price) || 0;
+      });
+
+      const totalDisplay = document.getElementById('live-total');
+      if (totalDisplay) {
+        totalDisplay.innerText = `$${total.toFixed(2)}`;
+      }
+    }
+
     function updateItemCheckboxes(products) {
       const container = document.getElementById('item-checkboxes');
       if (!container) return;
 
       if (!products || products.length === 0) {
         container.innerHTML = '<p style="margin: 0; color: gray;">No items available.</p>';
+        updateLiveTotal();
         return;
       }
 
       container.innerHTML = products.map((item, index) => `
         <div class="item-checkbox-row">
-          <input type="checkbox" id="item-check-${index}" value="${item.title}">
+          <input type="checkbox" id="item-check-${index}" value="${item.title}" onchange="updateLiveTotal()">
           <label for="item-check-${index}">${item.title} ($${item.price})</label>
         </div>
       `).join('');
+
+      updateLiveTotal();
     }
 
     function displayProducts() {
@@ -409,6 +452,7 @@
           cb.checked = true;
         }
       });
+      updateLiveTotal();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -417,13 +461,27 @@
       const address = document.getElementById('cust-address').value;
 
       const selectedBoxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked');
-      const selectedItems = Array.from(selectedBoxes).map(cb => cb.value);
-
-      if (!customer || selectedItems.length === 0 || !address) {
+      
+      if (!customer || selectedBoxes.length === 0 || !address) {
         alert('Please select a name, at least ONE item, and an address!');
         return;
       }
 
+      const products = getProducts();
+      const selectedItems = [];
+      let totalPrice = 0;
+
+      selectedBoxes.forEach(cb => {
+        const itemTitle = cb.value;
+        selectedItems.push(itemTitle);
+
+        const foundProduct = products.find(p => p.title === itemTitle);
+        if (foundProduct) {
+          totalPrice += parseFloat(foundProduct.price) || 0;
+        }
+      });
+
+      const formattedTotal = `$${totalPrice.toFixed(2)}`;
       const FORMSPREE_URL = "https://formspree.io/f/maewbvzr";
 
       fetch(FORMSPREE_URL, {
@@ -433,15 +491,17 @@
           "Customer Name": customer,
           "Items Ordered": selectedItems.join(', '),
           "Total Items": selectedItems.length,
+          "Total Price": formattedTotal,
           "Delivery Address": address
         })
       })
       .then(res => {
         if (res.ok) {
-          alert(`Order sent successfully! (${selectedItems.length} items ordered)`);
+          alert(`Order sent successfully! (${selectedItems.length} items ordered for ${formattedTotal})`);
           document.getElementById('cust-name').selectedIndex = 0;
           document.getElementById('cust-address').selectedIndex = 0;
           document.querySelectorAll('#item-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
+          updateLiveTotal();
         } else {
           alert('Failed to send order. Check your Formspree URL.');
         }
