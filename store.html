@@ -33,7 +33,7 @@
     }
 
     main {
-      max-width: 950px;
+      max-width: 1000px;
       margin: 20px auto;
       padding: 0 12px;
       display: flex;
@@ -160,7 +160,7 @@
       border-radius: 6px;
       padding: 8px;
       margin-bottom: 10px;
-      max-height: 120px;
+      max-height: 140px;
       overflow-y: auto;
     }
 
@@ -171,6 +171,7 @@
       font-size: 0.85rem;
       font-weight: bold;
       cursor: pointer;
+      margin-bottom: 4px;
     }
 
     .checkbox-item input {
@@ -240,7 +241,7 @@
       border: 3px solid #000000;
       border-radius: 12px;
       padding: 14px;
-      width: 220px;
+      width: 200px;
       text-align: center;
       box-shadow: 4px 4px 0px #000000;
       display: flex;
@@ -260,6 +261,10 @@
       font-size: 0.9rem;
       margin-bottom: 6px;
       font-weight: bold;
+      min-height: 2.2em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .product-card .price {
@@ -274,12 +279,12 @@
       color: #ffffff;
       border: 1.5px solid #000000;
       border-radius: 4px;
-      padding: 4px 10px;
+      padding: 5px 10px;
       font-size: 0.75rem;
       font-weight: bold;
       cursor: pointer;
       margin-bottom: 6px;
-      width: 80%;
+      width: 85%;
     }
 
     .btn-delete {
@@ -287,11 +292,11 @@
       color: #ffffff;
       border: 1.5px solid #000000;
       border-radius: 4px;
-      padding: 4px 10px;
+      padding: 5px 10px;
       font-size: 0.75rem;
       font-weight: bold;
       cursor: pointer;
-      width: 80%;
+      width: 85%;
     }
   </style>
 </head>
@@ -306,12 +311,12 @@
     <div class="audio-card">
       <h3>🎵 Live Synced Announcement 🎵</h3>
       <button id="playAudioBtn" class="btn-audio">⏸️ Pause for Everyone</button>
-      <div class="audio-status">Connected! Tap Play to sync.</div>
+      <div class="audio-status">Broadcasting Play...</div>
     </div>
 
     <div class="flex-container">
 
-      <!-- Left Card -->
+      <!-- Sell Supa Merch Card -->
       <div class="card-box sell-card">
         <h2>⚡ Sell Supa Merch ⚡</h2>
         <form id="sellForm">
@@ -335,14 +340,14 @@
         </form>
       </div>
 
-      <!-- Right Card -->
+      <!-- Order & Choose Address Card -->
       <div class="card-box order-card">
         <h2>📦 Order & Choose Address 📦</h2>
         <form id="checkoutForm" action="https://formspree.io/f/maewbvzr" method="POST">
           
           <div class="field-group">
             <select id="userName" name="customer_name" required>
-              <option value="" disabled selected>-- Select Your Name --</option>
+              <option value="" disabled selected>- Select Your Name -</option>
               <option value="Arthur">Arthur</option>
               <option value="Denise">Denise</option>
               <option value="Josh">Josh</option>
@@ -353,7 +358,7 @@
           <div class="select-label">Select Items to Order:</div>
 
           <div id="checkboxContainer" class="checkbox-box">
-            <!-- Items populated via JS -->
+            <!-- Populated via JavaScript -->
           </div>
 
           <div class="total-bar">
@@ -362,7 +367,7 @@
 
           <div class="field-group">
             <select id="userAddress" name="delivery_address" required>
-              <option value="" disabled selected>-- Select Delivery Address --</option>
+              <option value="" disabled selected>- Select Delivery Address -</option>
               <option value="Arthur's House">Arthur's House</option>
               <option value="Denise's House">Denise's House</option>
               <option value="Josh's House">Josh's House</option>
@@ -379,9 +384,9 @@
 
     </div>
 
-    <!-- Product Grid -->
+    <!-- Dynamic Product Card Grid -->
     <div id="productsGrid" class="products-container">
-      <!-- Hardcoded / Loaded Products -->
+      <!-- Generated via JavaScript -->
     </div>
 
   </main>
@@ -394,40 +399,8 @@
     const CHANNEL_NAME = 'dogman-store';
     const EVENT_NAME = 'play-sound';
 
-    // HARDCODED DEFAULT ITEMS (WILL NEVER DISAPPEAR ON REFRESH)
-    const initialItems = [
-      {
-        id: 'default-1',
-        name: 'Pikachu Federtasche',
-        price: '5.00',
-        image: 'https://m.media-amazon.com/images/I/71yR3A-E-LL.jpg'
-      },
-      {
-        id: 'default-2',
-        name: 'Dog Man Book Vol. 1',
-        price: '9.99',
-        image: 'https://m.media-amazon.com/images/I/81q6xP8a3FL.jpg'
-      },
-      {
-        id: 'default-3',
-        name: 'Petey Plushie',
-        price: '14.99',
-        image: 'https://m.media-amazon.com/images/I/71yR3A-E-LL.jpg'
-      },
-      {
-        id: 'default-4',
-        name: 'Bark Knight Badge',
-        price: '4.99',
-        image: 'https://m.media-amazon.com/images/I/61+R+xI2uBL.jpg'
-      }
-    ];
-
-    // Read stored items or fallback to default hardcoded array
-    let products = JSON.parse(localStorage.getItem('dogman_items'));
-    if (!products || products.length === 0) {
-      products = initialItems;
-      localStorage.setItem('dogman_items', JSON.stringify(products));
-    }
+    // Reads items stored in browser local storage
+    let products = JSON.parse(localStorage.getItem('dogman_items')) || [];
 
     const syncAudio = document.getElementById('syncAudio');
     const playAudioBtn = document.getElementById('playAudioBtn');
@@ -473,6 +446,7 @@
       checkboxContainer.innerHTML = '';
 
       products.forEach((prod, index) => {
+        // Product Cards Grid
         const card = document.createElement('div');
         card.className = 'product-card';
         card.innerHTML = `
@@ -484,6 +458,7 @@
         `;
         productsGrid.appendChild(card);
 
+        // Order Checkbox Item
         const label = document.createElement('label');
         label.className = 'checkbox-item';
         label.innerHTML = `
