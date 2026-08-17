@@ -472,7 +472,7 @@
     <div class="seller-section">
       <h2>⚡ Sell Supa Merch ⚡</h2>
       <input type="text" id="title" placeholder="Item Name (e.g., Supa Buddy Pin)" required><br>
-      <input type="number" id="price" placeholder="Price ($)" step="0.01" required><br>
+      <input type="number" id="price" placeholder="Price (DZD)" step="0.01" required><br>
       
       <input type="text" id="image-url" placeholder="Paste Image URL (https...)" oninput="updateImagePreview()"><br>
       
@@ -506,7 +506,7 @@
       </div>
 
       <div class="total-box">
-        Total Amount: <span id="live-total">$0.00</span>
+        Total Amount: <span id="live-total">DZD 0.00</span>
       </div>
 
       <div style="font-weight: bold; margin-top: 10px;">Select Delivery Address:</div>
@@ -850,7 +850,7 @@
 
       const totalDisplay = document.getElementById('live-total');
       if (totalDisplay) {
-        totalDisplay.innerText = `$${total.toFixed(2)}`;
+        totalDisplay.innerText = `DZD ${total.toFixed(2)}`;
       }
 
       const badge = document.getElementById('cart-badge');
@@ -878,7 +878,7 @@
         return `
           <div class="item-checkbox-row">
             <input type="checkbox" id="item-check-${uniqueId}" value="${uniqueId}" ${isChecked} onchange="updateLiveTotal()">
-            <label for="item-check-${uniqueId}">${item.title} ($${parseFloat(item.price).toFixed(2)})</label>
+            <label for="item-check-${uniqueId}">${item.title} (DZD ${parseFloat(item.price).toFixed(2)})</label>
           </div>
         `;
       }).join('');
@@ -932,7 +932,7 @@
             </div>
             <img src="${imgSrc}" alt="${safeTitle}" onerror="this.src='https://via.placeholder.com/120?text=Invalid+Image'">
             <h4>${safeTitle.length > 25 ? safeTitle.substring(0, 25) + '...' : safeTitle}</h4>
-            <div class="price">$${parseFloat(item.price).toFixed(2)}</div>
+            <div class="price">DZD ${parseFloat(item.price).toFixed(2)}</div>
             <button class="buy-btn" onclick="quickBuy('${uniqueId}')">Buy Item</button>
           </div>
         `;
@@ -1022,7 +1022,7 @@
         }
       });
 
-      const formattedTotal = `$${totalPrice.toFixed(2)}`;
+      const formattedTotal = `DZD ${totalPrice.toFixed(2)}`;
       const FORMSPREE_URL = "https://formspree.io/f/maewbvzr";
 
       fetch(FORMSPREE_URL, {
