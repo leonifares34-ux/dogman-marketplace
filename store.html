@@ -795,7 +795,7 @@
         const safeTitle = (item.title || 'Item').replace(/'/g, "\\'").replace(/"/g, '&quot;');
         const imgSrc = item.image || 'https://via.placeholder.com/120?text=No+Image';
         let ribbonHtml = '';
-        if (item.title.toLowerCase().includes('dog man') || item.title.toLowerCase().includes('algerian')) {
+        if (item.title.toLowerCase().includes('sajadah') || item.title.toLowerCase().includes('algerian') || item.title.toLowerCase().includes('stw') || item.title.toLowerCase().includes('algeria')) {
           ribbonHtml = '<div class="ribbon hot">🔥 HOT</div>';
         }
         return `<div class="card"><div class="card-top-bar">${ribbonHtml}<button class="delete-btn" onclick="deleteItem('${uniqueId}')" title="Delete Item">🗑️</button></div><img src="${imgSrc}" alt="${safeTitle}" onerror="this.src='https://via.placeholder.com/120?text=Invalid+Image'"><h4>${safeTitle.length > 25 ? safeTitle.substring(0, 25) + '...' : safeTitle}</h4><div class="price">DZD ${parseFloat(item.price).toFixed(2)}</div><button class="buy-btn" onclick="quickBuy('${uniqueId}')">Buy Item</button></div>`;
