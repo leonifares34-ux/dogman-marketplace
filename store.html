@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Dog Man Marketplace</title>
-  <!-- Free Pusher SDK -->
   <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
   <style>
     :root {
@@ -137,7 +136,6 @@
       cursor: pointer;
     }
 
-    /* Scrollable Address Card Grid */
     .address-grid {
       display: flex;
       flex-wrap: wrap;
@@ -233,7 +231,6 @@
     }
     .order-btn:hover { background-color: #cc0000; }
 
-    /* Search & Filter Bar Styles */
     .filter-container {
       text-align: center;
       margin: 25px auto 10px auto;
@@ -411,6 +408,33 @@
       box-sizing: border-box;
       transition: border-color 0.3s;
     }
+
+    #image-preview-container {
+      width: 90%;
+      margin: 10px auto;
+      border: 3px dashed var(--element-border);
+      border-radius: 8px;
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.05);
+      transition: all 0.3s;
+    }
+    body.dark-mode #image-preview-container {
+      background: rgba(0,210,255,0.08);
+    }
+    #image-preview-container img {
+      max-width: 100%;
+      max-height: 150px;
+      border-radius: 6px;
+      border: 2px solid var(--element-border);
+    }
+    #image-preview-container .placeholder-text {
+      color: gray;
+      font-size: 0.85em;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body id="page-body">
@@ -450,12 +474,16 @@
       <input type="text" id="title" placeholder="Item Name (e.g., Supa Buddy Pin)" required><br>
       <input type="number" id="price" placeholder="Price ($)" step="0.01" required><br>
       
-      <input type="text" id="image-url" placeholder="Paste Image URL (https...)"><br>
+      <input type="text" id="image-url" placeholder="Paste Image URL (https...)" oninput="updateImagePreview()"><br>
       
       <div style="font-weight: bold; margin: 4px 0;">— OR —</div>
       
       <label style="font-size: 0.85em; font-weight: bold; display: block;">Upload Image File:</label>
-      <input type="file" id="image-file" accept="image/*"><br>
+      <input type="file" id="image-file" accept="image/*" onchange="updateImagePreview()"><br>
+
+      <div id="image-preview-container">
+        <span class="placeholder-text">Image preview will appear here</span>
+      </div>
       
       <button class="seller-btn" onclick="addItem()">List Item!</button>
     </div>
@@ -483,7 +511,6 @@
 
       <div style="font-weight: bold; margin-top: 10px;">Select Delivery Address:</div>
       
-      <!-- Visual Address Menu Cards -->
       <div class="address-grid">
         <label class="address-card" onclick="selectAddress(this)">
           <input type="radio" name="cust-address" value="Bomboklat Street 1">
@@ -614,7 +641,6 @@
       { id: 'def_42', title: 'Dog Man 1', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+1' }
     ];
 
-    // Load products from localStorage or fall back to defaults
     let productsList = [];
     try {
       const savedProducts = localStorage.getItem('dogman_products');
@@ -666,6 +692,27 @@
       const randomItem = productsList[Math.floor(Math.random() * productsList.length)];
       document.getElementById('search-input').value = randomItem.title;
       displayProducts();
+    }
+
+    // ==========================================
+    // IMAGE PREVIEW
+    // ==========================================
+    function updateImagePreview() {
+      const container = document.getElementById('image-preview-container');
+      const urlInput = document.getElementById('image-url');
+      const fileInput = document.getElementById('image-file');
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          container.innerHTML = '<img src="' + e.target.result + '" alt="Preview">';
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else if (urlInput.value.trim()) {
+        container.innerHTML = '<img src="' + urlInput.value.trim() + '" alt="Preview" onerror="this.parentElement.innerHTML=\'<span class=placeholder-text>Invalid image URL</span>\'">';
+      } else {
+        container.innerHTML = '<span class="placeholder-text">Image preview will appear here</span>';
+      }
     }
 
     // ==========================================
@@ -922,6 +969,7 @@
         document.getElementById('price').value = '';
         document.getElementById('image-url').value = '';
         fileInput.value = '';
+        document.getElementById('image-preview-container').innerHTML = '<span class="placeholder-text">Image preview will appear here</span>';
 
         displayProducts();
       }
