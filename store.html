@@ -157,15 +157,35 @@
       margin-bottom: 25px;
     }
 
+    .search-box-wrapper {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      max-width: 550px;
+      justify-content: center;
+      align-items: center;
+    }
+
     #searchInput {
       padding: 10px;
       width: 100%;
-      max-width: 450px;
+      max-width: 400px;
       border: 2px solid var(--element-border);
       border-radius: 8px;
       background: var(--card-bg);
       color: var(--text-color);
       font-weight: bold;
+    }
+
+    .surprise-btn {
+      padding: 10px 14px;
+      background: #ff4757;
+      color: #fff;
+      border: 2px solid var(--element-border);
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 2px 2px 0px var(--element-border);
     }
 
     .filter-chips {
@@ -286,7 +306,7 @@
 <body class="page-body">
 
   <header>
-    <button class="theme-toggle" onclick="toggleDarkMode()">Light Mode</button>
+    <button class="theme-toggle" onclick="toggleDarkMode()">Night Mode</button>
     <h1>🐶 DOG MAN MARKETPLACE 🐱</h1>
     
     <div class="sync-status-box">
@@ -313,7 +333,7 @@
     <section class="seller-section">
       <h2>💸 Sell Supa Merch</h2>
       <input type="text" id="itemTitle" placeholder="Item Name (e.g., Supa Buddy Pin)">
-      <input type="number" id="itemPrice" placeholder="Price in DZD" step="0.01">
+      <input type="number" id="itemPrice" placeholder="Price ($)" step="0.01">
       <input type="text" id="itemImage" placeholder="Paste Image URL (or local path)">
       <div style="font-weight: bold; font-size: 0.85rem; margin: 6px 0;">— OR —</div>
       <input type="file" id="imageFile" accept="image/*" style="font-size: 0.85rem; margin-bottom: 10px;">
@@ -324,7 +344,7 @@
     <section class="checkout-section">
       <h2>🛒 Order & Choose Address</h2>
       <select id="itemSelect" onchange="updateTotal()">
-        <option value="">-- Select Item to Order --</option>
+        <option value="">-- Select Your Name --</option>
       </select>
       
       <div style="font-weight: bold; margin-top: 10px;">Select Items to Order:</div>
@@ -332,7 +352,7 @@
         <!-- Checkboxes for items -->
       </div>
 
-      <div style="font-weight: bold; margin-top: 10px; font-size: 1.1rem;" id="totalDisplay">Total Amount: 0.00 DZD</div>
+      <div style="font-weight: bold; margin-top: 10px; font-size: 1.1rem;" id="totalDisplay">Total Amount: $0.00</div>
       
       <div style="font-weight: bold; margin-top: 10px;">Select Delivery Address:</div>
       <div class="address-grid" id="addressGrid">
@@ -352,13 +372,20 @@
 
   <!-- Search & Filters -->
   <div class="search-filter-bar">
-    <input type="text" id="searchInput" placeholder="Search items (e.g., Dog Man, Squishy, Purse)..." onkeyup="filterProducts()">
+    <div class="search-box-wrapper">
+      <input type="text" id="searchInput" placeholder="Search items (e.g., Dog Man, Squishy, Purse)..." onkeyup="filterProducts()">
+      <button class="surprise-btn" onclick="surpriseMe()">🎁 Surprise Me!</button>
+    </div>
     <div class="filter-chips">
       <button class="filter-chip active" onclick="setCategory('all')">All Items</button>
       <button class="filter-chip" onclick="setCategory('dog man')">Dog Man</button>
       <button class="filter-chip" onclick="setCategory('squishies')">Squishies</button>
-      <button class="filter-chip" onclick="setCategory('algeria')">Algerian</button>
-      <button class="filter-chip" onclick="setCategory('hot')">🔥 Hot</button>
+      <button class="filter-chip" onclick="setCategory('purses')">Purses</button>
+      <button class="filter-chip" onclick="setCategory('fedoras')">Fedoras</button>
+      <button class="filter-chip" onclick="setCategory('bookmarks')">Bookmarks</button>
+      <button class="filter-chip" onclick="setCategory('fidgets')">Fidgets</button>
+      <button class="filter-chip" onclick="setCategory('algerian')">🇦🇩 Algerian</button>
+      <button class="filter-chip" onclick="setCategory('expensive')">Expensive</button>
     </div>
   </div>
 
@@ -369,12 +396,12 @@
 
   <script>
     const defaultProducts = [
-      { id: 'prod_1', title: 'Algerian Flag & Algeria Souvenir', price: 950.00, image: 'https://via.placeholder.com/150?text=Algeria', category: 'algeria', isHot: true },
-      { id: 'prod_2', title: 'Mickey Squishy', price: 1050.00, image: 'https://via.placeholder.com/150?text=Mickey', category: 'squishies', isHot: false },
-      { id: 'prod_3', title: 'Spedi Squishy', price: 750.00, image: 'https://via.placeholder.com/150?text=Spedi', category: 'squishies', isHot: false },
-      { id: 'prod_4', title: 'Dog Man 12', price: 1650.00, image: 'https://via.placeholder.com/150?text=DogMan12', category: 'dog man', isHot: true },
-      { id: 'prod_5', title: 'Dog Man 11', price: 1650.00, image: 'https://via.placeholder.com/150?text=DogMan11', category: 'dog man', isHot: false },
-      { id: 'prod_6', title: 'Dog Man 10', price: 1650.00, image: 'https://via.placeholder.com/150?text=DogMan10', category: 'dog man', isHot: false }
+      { id: 'prod_1', title: 'Dog Man 12', price: 11.00, image: 'https://via.placeholder.com/150?text=DogMan12', category: 'dog man', isHot: true },
+      { id: 'prod_2', title: 'Dog Man 11', price: 11.00, image: 'https://via.placeholder.com/150?text=DogMan11', category: 'dog man', isHot: false },
+      { id: 'prod_3', title: 'Dog Man 10', price: 11.00, image: 'https://via.placeholder.com/150?text=DogMan10', category: 'dog man', isHot: false },
+      { id: 'prod_4', title: 'Dog Man 9', price: 11.00, image: 'https://via.placeholder.com/150?text=DogMan9', category: 'dog man', isHot: false },
+      { id: 'prod_5', title: 'Dog Man 8', price: 11.00, image: 'https://via.placeholder.com/150?text=DogMan8', category: 'dog man', isHot: false },
+      { id: 'prod_6', title: 'Dog Man 7', price: 11.00, image: 'https://via.placeholder.com/150?text=DogMan7', category: 'dog man', isHot: false }
     ];
 
     let productsList = [];
@@ -413,20 +440,20 @@
     }
 
     function loadProducts() {
-      const saved = localStorage.getItem('dogman_dzd_products');
+      const saved = localStorage.getItem('dogman_products');
       productsList = saved ? JSON.parse(saved) : [...defaultProducts];
       updateDropdownAndCheckboxes();
       displayProducts();
     }
 
     function saveProducts() {
-      localStorage.setItem('dogman_dzd_products', JSON.stringify(productsList));
+      localStorage.setItem('dogman_products', JSON.stringify(productsList));
     }
 
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
       const btn = document.querySelector('.theme-toggle');
-      btn.textContent = document.body.classList.contains('dark-mode') ? 'Dark Mode' : 'Light Mode';
+      btn.textContent = document.body.classList.contains('dark-mode') ? 'Day Mode' : 'Night Mode';
     }
 
     function setCategory(cat) {
@@ -444,7 +471,7 @@
       const filtered = productsList.filter(item => {
         const matchesCat = currentCategory === 'all' || 
                            item.category === currentCategory || 
-                           (currentCategory === 'hot' && item.isHot) ||
+                           (currentCategory === 'expensive' && item.price > 15) ||
                            item.title.toLowerCase().includes(currentCategory);
         const matchesSearch = item.title.toLowerCase().includes(query) || item.id.toLowerCase().includes(query);
         return matchesCat && matchesSearch;
@@ -461,7 +488,7 @@
           <button class="delete-btn" onclick="deleteProduct('${item.id}')">🗑️</button>
           <img src="${item.image}" alt="${item.title}">
           <h3>${item.title}</h3>
-          <p class="price">${item.price.toFixed(2)} DZD</p>
+          <p class="price">$${item.price.toFixed(2)}</p>
           <button class="buy-btn" onclick="selectItemForOrder('${item.id}')">Buy Item</button>
         </div>
       `).join('');
@@ -469,12 +496,12 @@
 
     function updateDropdownAndCheckboxes() {
       const select = document.getElementById('itemSelect');
-      select.innerHTML = '<option value="">-- Select Item to Order --</option>' + 
-        productsList.map(item => `<option value="${item.id}">${item.title} (${item.price.toFixed(2)} DZD)</option>`).join('');
+      select.innerHTML = '<option value="">-- Select Your Name --</option>' + 
+        productsList.map(item => `<option value="${item.id}">${item.title} ($${item.price.toFixed(2)})</option>`).join('');
 
       const checkboxContainer = document.getElementById('checkboxItemsContainer');
       checkboxContainer.innerHTML = productsList.map(item => `
-        <label><input type="checkbox" value="${item.id}" onchange="updateTotal()"> ${item.title} (${item.price.toFixed(2)} DZD)</label>
+        <label><input type="checkbox" value="${item.id}" onchange="updateTotal()"> ${item.title} ($${item.price.toFixed(2)})</label>
       `).join('');
     }
 
@@ -492,7 +519,7 @@
         if (item) total += item.price;
       });
 
-      document.getElementById('totalDisplay').textContent = `Total Amount: ${total.toFixed(2)} DZD`;
+      document.getElementById('totalDisplay').textContent = `Total Amount: $${total.toFixed(2)}`;
     }
 
     function selectItemForOrder(id) {
@@ -512,6 +539,17 @@
       });
     }
 
+    function surpriseMe() {
+      if (productsList.length === 0) return;
+      const randomItem = productsList[Math.floor(Math.random() * productsList.length)];
+      document.getElementById('searchInput').value = randomItem.title;
+      filterProducts();
+    }
+
+    function filterProducts() {
+      displayProducts();
+    }
+
     function addNewItem() {
       const title = document.getElementById('itemTitle').value.trim();
       const price = parseFloat(document.getElementById('itemPrice').value);
@@ -519,7 +557,7 @@
       const fileInput = document.getElementById('imageFile');
 
       if (!title || isNaN(price)) {
-        alert('Please fill in a valid title and price in DZD.');
+        alert('Please fill in a valid title and price.');
         return;
       }
 
@@ -539,11 +577,15 @@
       let category = 'all';
       let isHot = false;
       const lower = title.toLowerCase();
-      if (lower.includes('algeria') || lower.includes('algerian')) category = 'algeria';
+      if (lower.includes('algeria') || lower.includes('algerian')) category = 'algerian';
       else if (lower.includes('squishy')) category = 'squishies';
+      else if (lower.includes('purse')) category = 'purses';
+      else if (lower.includes('fedora')) category = 'fedoras';
+      else if (lower.includes('bookmark')) category = 'bookmarks';
+      else if (lower.includes('fidget')) category = 'fidgets';
       else if (lower.includes('dog man')) category = 'dog man';
       
-      if (lower.includes('hot') || price > 1500) isHot = true;
+      if (lower.includes('hot') || price > 15) isHot = true;
 
       productsList.push({ id: 'prod_' + Date.now(), title, price, image, category, isHot });
       saveProducts();
