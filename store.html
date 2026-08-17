@@ -2,29 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dog Man Marketplace</title>
-  <!-- Free Pusher SDK -->
+  <!-- Pusher Script -->
   <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
   <style>
     :root {
-      --bg-color: #ffcc00;
+      --bg-color: #f0f2f5;
       --card-bg: #ffffff;
-      --text-color: #000000;
-      --header-bg: #0088cc;
-      --checkout-bg: #0088cc;
-      --element-border: #000000;
-      --box-shadow: 5px 5px 0px #000000;
-      --small-shadow: 3px 3px 0px #000000;
+      --text-color: #333333;
+      --header-bg: #1e1e1e;
+      --header-text: #ffffff;
+      --element-border: #cccccc;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --small-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
     }
-    body.dark-mode {
+
+    body.dark_mode {
       --bg-color: #121212;
-      --card-bg: #2d2d2d;
+      --card-bg: #1e1e1e;
       --text-color: #e0e0e0;
-      --header-bg: #1a1a1a;
-      --checkout-bg: #1a1a1a;
-      --element-border: #00d2ff;
-      --box-shadow: 5px 5px 0px #ffe600, 0px 0px 15px rgba(0, 210, 255, 0.6);
-      --small-shadow: 3px 3px 0px #ffe600, 0px 0px 8px rgba(0, 210, 255, 0.4);
+      --header-bg: #2d2d2d;
+      --header-text: #ffffff;
+      --element-border: #444444;
+      --shadow: rgba(0, 0, 0, 0.5);
+      --small-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
     }
 
     body {
@@ -35,105 +37,116 @@
       padding: 0;
       transition: background-color 0.3s, color 0.3s;
     }
+
     header {
       background-color: var(--header-bg);
-      color: #2d2d2d;
+      color: var(--header-text);
       padding: 20px;
       text-align: center;
-      border-bottom: 5px solid var(--element-border);
       position: relative;
-      box-shadow: 0px 0px 20px rgba(0, 210, 255, 0.3);
+      border-bottom: 2px solid var(--element-border);
       transition: border-color 0.3s, background-color 0.3s;
     }
-    body.dark-mode header {
-      color: #ffe600;
+
+    body.dark_mode header {
+      border-color: #444;
     }
+
     .theme-toggle-btn {
       position: absolute;
-      right: 20px;
       top: 20px;
+      right: 20px;
       background: var(--card-bg);
       color: var(--text-color);
-      border: 3px solid var(--element-border);
-      padding: 8px 12px;
+      border: 2px solid var(--element-border);
+      padding: 8px 16px;
       border-radius: 8px;
-      font-weight: bold;
       cursor: pointer;
-      box-shadow: var(--small-shadow);
+      font-weight: bold;
+      font-size: 14px;
       font-family: inherit;
-      transition: all 0.3s;
+      box-shadow: var(--small-shadow);
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
     }
+
+    .theme-toggle-btn:hover {
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
     .container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 20px;
+      max-width: 1200px;
       margin: 20px auto;
-      max-width: 1100px;
-      padding: 0 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
+
     .seller-section, .checkout-section {
       background-color: var(--card-bg);
-      border: 4px solid var(--element-border);
-      box-shadow: var(--box-shadow);
-      flex: 1;
-      min-width: 300px;
-      max-width: 480px;
-      padding: 20px;
+      border: 2px solid var(--element-border);
       border-radius: 12px;
-      text-align: center;
+      box-shadow: 4px 4px 0px var(--shadow), 0px 0px 0px 1px var(--element-border);
+      padding: 20px;
       box-sizing: border-box;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      text-align: center;
       transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
     }
-    .checkout-section {
-      background-color: var(--checkout-bg);
-      color: var(--text-color);
+
+    body.dark_mode .seller-section,
+    body.dark_mode .checkout-section {
+      border-color: #444;
+      box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
     }
-    body.dark-mode .checkout-section {
-      color: #ffe600;
-    }
-    .seller-section input, .checkout-section input, .checkout-section select, #audio-select {
-      width: 90%;
+
+    .seller-section input-checkbox, .checkout-section select, .audio-select {
+      width: 100%;
       padding: 10px;
-      margin: 6px 0;
-      border: 3px solid var(--element-border);
-      border-radius: 6px;
-      font-weight: bold;
+      margin: 10px 0;
+      border: 2px solid var(--element-border);
+      border-radius: 4px;
+      font-size: 14px;
       font-family: inherit;
-      box-sizing: border-box;
       background-color: var(--card-bg);
       color: var(--text-color);
-      transition: all 0.3s;
+      box-sizing: border-box;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
     }
+
     .item-checkbox-container {
-      background: var(--card-bg);
-      color: var(--text-color);
-      border: 3px solid var(--element-border);
-      border-radius: 6px;
-      padding: 10px;
+      display: flex;
+      flex-direction: column;
       max-height: 150px;
       overflow-y: auto;
+      border: 2px solid var(--element-border);
+      border-radius: 4px;
+      padding: 8px;
+      margin: 10px 0;
       text-align: left;
-      margin: 8px auto;
-      width: 90%;
-      box-sizing: border-box;
+      background-color: var(--bg-color);
       transition: all 0.3s;
     }
+
     .item-checkbox-row {
       display: flex;
       align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
+      gap: 8px;
+      margin-bottom: 4px;
     }
+
     .item-checkbox-row input[type="checkbox"] {
       width: auto;
       margin: 0;
       transform: scale(1.3);
       cursor: pointer;
     }
+
     .item-checkbox-row label {
-      font-weight: bold;
-      font-size: 0.9em;
+      font-size: 14px;
+      font-weight: normal;
       cursor: pointer;
     }
 
@@ -142,176 +155,220 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      justify-content: center;
-      margin: 10px auto;
-      width: 95%;
-      max-height: 220px;
+      max-height: 230px;
       overflow-y: auto;
-      padding: 5px;
-      background: rgba(0, 0, 0, 0.15);
-      border: 3px solid var(--element-border);
-      border-radius: 8px;
+      margin: 10px auto;
+      padding: 4px;
+      width: 100%;
       box-sizing: border-box;
-      transition: border-color 0.3s;
+      justify-content: center;
+      border: 2px solid var(--element-border);
+      border-radius: 8px;
+      background-color: var(--bg-color);
+      transition: border-color 0.3s, background-color 0.3s;
     }
-    body.dark-mode .address-grid {
-      background: rgba(0, 210, 255, 0.08);
+
+    body.dark_mode .address-grid {
+      border-color: #444;
+      background-color: #181818;
     }
+
     .address-card {
       background: var(--card-bg);
-      color: var(--text-color);
-      border: 3px solid var(--element-border);
+      border: 2px solid var(--element-border);
       border-radius: 8px;
-      padding: 6px;
-      width: 105px;
+      padding: 8px;
+      width: 100px;
+      min-height: 100px;
       cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
       box-shadow: var(--small-shadow);
       transition: transform 0.1s, border-color 0.3s, background-color 0.3s;
       box-sizing: border-box;
+      position: relative;
     }
+
     .address-card:hover {
       transform: translateY(-2px);
     }
+
     .address-card input[type="radio"] {
       display: none;
     }
+
     .address-card img {
       width: 100%;
-      height: 55px;
+      height: 50px;
       object-fit: cover;
-      border: 2px solid var(--element-border);
       border-radius: 4px;
       margin-bottom: 4px;
-      transition: border-color 0.3s;
+      border: 1px solid var(--element-border);
     }
+
     .address-card span {
-      font-size: 0.7em;
-      display: block;
-      line-height: 1.1em;
+      font-size: 10px;
       font-weight: bold;
+      line-height: 1.1em;
+      color: var(--text-color);
+      word-break: break-word;
     }
-    .address-card.selected {
-      border: 4px solid #ffe600;
-      background-color: #383838;
-      color: #ffe600;
+
+    .address-card-selected {
+      border-color: #ffcc00 !important;
+      background-color: #fff9e6 !important;
+      color: #000000;
+    }
+
+    body.dark_mode .address-card-selected {
+      background-color: #332b00 !important;
+      color: #ffffff;
     }
 
     .seller-btn {
-      background-color: #28a745;
-      color: #2d2d2d;
-      font-size: 1em;
-      border: 3px solid var(--element-border);
-      padding: 10px 15px;
-      border-radius: 6px;
+      background: #4bb543;
+      color: #ffffff;
+      border: 2px solid var(--element-border);
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 4px;
       cursor: pointer;
-      box-shadow: var(--small-shadow);
-      margin-top: 10px;
       font-weight: bold;
-      transition: all 0.3s;
+      width: 100%;
+      margin-top: 10px;
+      box-shadow: var(--small-shadow);
+      transition: transform 0.1s;
     }
-    body.dark-mode .seller-btn {
-      color: #ffe600;
+
+    .seller-btn:hover {
+      background: #3e9e38;
+      transform: scale(1.01);
     }
-    .seller-btn:hover { background-color: #218838; }
 
     .order-btn {
-      background-color: #ff3333;
-      color: #2d2d2d;
-      font-size: 1em;
-      border: 3px solid var(--element-border);
-      padding: 10px 15px;
-      border-radius: 6px;
+      background: #ffcc00;
+      color: #000000;
+      border: 2px solid var(--element-border);
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 4px;
       cursor: pointer;
-      box-shadow: var(--small-shadow);
-      margin-top: 10px;
       font-weight: bold;
-      transition: all 0.3s;
+      width: 100%;
+      margin-top: 10px;
+      box-shadow: var(--small-shadow);
+      transition: transform 0.1s;
     }
-    body.dark-mode .order-btn {
-      color: #ffe600;
+
+    .order-btn:hover {
+      background: #e6b800;
+      transform: scale(1.01);
     }
-    .order-btn:hover { background-color: #cc0000; }
+
+    body.dark_mode .order-btn {
+      background: #d4a017;
+      color: #ffffff;
+    }
 
     /* Search & Filter Bar Styles */
     .filter-container {
-      text-align: center;
-      margin: 25px auto 10px auto;
-      max-width: 900px;
-      padding: 0 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      margin: 20px auto;
+      max-width: 600px;
+      width: 100%;
+      padding: 0 10px;
+      box-sizing: border-box;
     }
+
     .search-row {
       display: flex;
-      justify-content: center;
-      align-items: center;
       gap: 10px;
-      flex-wrap: wrap;
+      width: 100%;
     }
-    #search-input {
-      width: 65%;
-      min-width: 260px;
-      padding: 12px 15px;
-      border: 4px solid var(--element-border);
-      border-radius: 10px;
-      font-weight: bold;
-      font-family: inherit;
-      font-size: 1em;
-      box-shadow: var(--box-shadow);
-      box-sizing: border-box;
-      background-color: var(--card-bg);
-      color: var(--text-color);
-      transition: all 0.3s;
-    }
-    .surprise-btn {
-      background-color: #9900ff;
-      color: #2d2d2d;
-      border: 4px solid var(--element-border);
-      padding: 12px 15px;
-      border-radius: 10px;
-      font-weight: bold;
-      font-family: inherit;
-      cursor: pointer;
-      box-shadow: var(--box-shadow);
-      font-size: 1em;
-      transition: all 0.3s;
-    }
-    body.dark-mode .surprise-btn {
-      color: #ffe600;
-    }
-    .surprise-btn:hover { background-color: #7a00cc; }
 
-    .filter-chips-wrapper {
-      margin-top: 12px;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 8px;
-    }
-    .filter-chip {
+    .search-input {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      border: 2px solid var(--element-border);
+      border-radius: 8px;
       background-color: var(--card-bg);
       color: var(--text-color);
-      border: 3px solid var(--element-border);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-weight: bold;
-      cursor: pointer;
+      outline: none;
       box-shadow: var(--small-shadow);
       font-family: inherit;
-      font-size: 0.9em;
-      transition: transform 0.1s, background-color 0.3s, border-color 0.3s;
+      box-sizing: border-box;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
     }
+
+    .surprise-btn {
+      background: #ff47ab;
+      color: #ffffff;
+      border: 2px solid var(--element-border);
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      font-family: inherit;
+      box-shadow: var(--small-shadow);
+      transition: transform 0.1s, background-color 0.3s;
+      white-space: nowrap;
+    }
+
+    .surprise-btn:hover {
+      background: #e03d99;
+      transform: scale(1.02);
+    }
+
+    body.dark_mode .surprise-btn {
+      background: #c71585;
+    }
+
+    .filter-chips-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .filter-chip {
+      background: var(--card-bg);
+      border: 2px solid var(--element-border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      color: var(--text-color);
+      box-shadow: var(--small-shadow);
+      transition: transform 0.1s, background-color 0.3s, color 0.3s, border-color 0.3s;
+      font-family: inherit;
+    }
+
     .filter-chip:hover {
       transform: translateY(-2px);
     }
-    .filter-chip.active {
-      background-color: #ff3333;
-      color: #2d2d2d;
-      border-color: var(--element-border);
-    }
-    body.dark-mode .filter-chip.active {
-      color: #ffe600;
+
+    .filter-chip-active {
+      background-color: #ffcc00 !important;
+      color: #000000 !important;
+      border-color: #cc9900 !important;
     }
 
+    body.dark_mode .filter-chip-active {
+      background-color: #d4a017 !important;
+      color: #ffffff !important;
+      border-color: #aa7a00 !important;
+    }
+
+    /* Card Grid Styles */
     .grid {
       display: flex;
       flex-wrap: wrap;
@@ -319,458 +376,391 @@
       justify-content: center;
       padding: 20px;
     }
+
     .card {
       background: var(--card-bg);
-      color: var(--text-color);
-      border: 4px solid var(--element-border);
+      border: 2px solid var(--element-border);
       border-radius: 12px;
-      padding: 15px;
       width: 220px;
-      text-align: center;
-      box-shadow: var(--box-shadow);
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
       position: relative;
-      transition: all 0.3s;
+      box-shadow: 4px 4px 0px var(--shadow), 0px 0px 0px 1px var(--element-border);
+      overflow: hidden;
+      transition: transform 0.2s, background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+      box-sizing: border-box;
     }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
     .card img {
-      max-width: 120px;
-      height: 120px;
+      width: 100%;
+      height: 140px;
       object-fit: contain;
     }
-    .card-top-bar {
+
+    .card-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 5px;
-      min-height: 24px;
+      margin-bottom: 8px;
+      padding: 0 10px;
     }
+
     .ribbon {
-      padding: 4px 8px;
-      font-size: 0.75em;
+      background: #ff47ab;
+      color: #ffffff;
+      padding: 2px 8px;
+      font-size: 11px;
       font-weight: bold;
-      border: 2px solid var(--element-border);
-      border-radius: 6px;
-      box-shadow: 2px 2px 0px var(--element-border);
-      transition: border-color 0.3s;
+      border-radius: 4px;
+      border: 1px solid var(--element-border);
     }
-    .ribbon.hot { background-color: #ff3333; color: #2d2d2d; }
-    body.dark-mode .ribbon.hot { color: #ffe600; }
-    .ribbon.new { background-color: #28a745; color: #2d2d2d; }
-    body.dark-mode .ribbon.new { color: #ffe600; }
+
+    .ribbon.dog { background-color: #ff5722; color: #ffffff; }
+    .ribbon.cat { background-color: #4caf50; color: #ffffff; }
+    .ribbon.misc { background-color: #9c27b0; color: #ffffff; }
+
+    body.dark_mode .ribbon.dog { background-color: #d84315; }
+    body.dark_mode .ribbon.cat { background-color: #388e3c; }
+    body.dark_mode .ribbon.misc { background-color: #7b1fa2; }
 
     .delete-btn {
-      background: #ff4d4d;
-      color: #2d2d2d;
+      background: transparent;
       border: 2px solid var(--element-border);
-      border-radius: 6px;
-      padding: 2px 6px;
-      font-size: 0.85em;
+      border-radius: 4px;
+      color: #ff3333;
       cursor: pointer;
+      font-size: 14px;
+      padding: 2px 6px;
       font-weight: bold;
-      box-shadow: 2px 2px 0px var(--element-border);
-      transition: transform 0.1s;
+      transition: transform 0.1s, background-color 0.3s;
+      box-shadow: var(--small-shadow);
     }
-    body.dark-mode .delete-btn {
-      color: #ffe600;
-    }
+
     .delete-btn:hover {
-      background: #cc0000;
-      transform: scale(1.05);
+      background-color: rgba(255, 0, 0, 0.1);
+      transform: scale(1.1);
+    }
+
+    .card h3 {
+      font-size: 14px;
+      margin: 0 10px 8px 10px;
+      flex-grow: 1;
+      color: var(--text-color);
     }
 
     .price {
-      color: #ff3333;
-      font-size: 1.3em;
-      margin: 10px 0;
-    }
-    body.dark-mode .price {
-      color: #ffe600;
-    }
-    .buy-btn {
-      background-color: #0088cc;
-      color: #2d2d2d;
+      background: #ffcc00;
+      color: #000000;
       border: 2px solid var(--element-border);
-      padding: 8px 12px;
-      border-radius: 6px;
+      padding: 6px;
+      text-align: center;
       font-weight: bold;
+      font-size: 14px;
+      margin: 10px;
+      border-radius: 6px;
+      box-shadow: var(--small-shadow);
+    }
+
+    body.dark_mode .price {
+      background: #d4a017;
+      color: #ffffff;
+    }
+
+    .buy-btn {
+      background: var(--text-color);
+      color: var(--card-bg);
+      border: 2px solid var(--element-border);
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+      font-size: 14px;
       cursor: pointer;
-      transition: border-color 0.3s;
+      border-radius: 0 0 10px 10px;
+      transition: background-color 0.3s, color 0.3s;
     }
-    body.dark-mode .buy-btn {
-      color: #ffe600;
+
+    .buy-btn:hover {
+      opacity: 0.9;
     }
+
     .total-box {
-      background-color: #ffcc00;
-      color: #2d2d2d;
-      border: 3px solid var(--element-border);
-      border-radius: 6px;
-      padding: 8px;
-      width: 90%;
-      margin: 10px auto;
-      font-size: 1.1em;
       font-weight: bold;
-      box-sizing: border-box;
-      transition: border-color 0.3s;
+      margin: 10px 0;
+      font-size: 16px;
+      color: var(--text-color);
     }
   </style>
 </head>
-<body id="page-body">
+<body class="page-body">
+
+  <button class="theme-toggle-btn" onclick="toggleDarkMode()">☀️ Light Mode</button>
 
   <header>
-    <button class="theme-toggle-btn" onclick="toggleDarkMode()">🌙 Night Mode</button>
-    <h1>🐶 DOG MAN MARKETPLACE 🚨</h1>
+    <h1>DOG MAN MARKETPLACE</h1>
   </header>
 
-  <!-- LIVE AUDIO PLAYER WIDGET -->
-  <div style="background: var(--card-bg); border: 4px solid var(--element-border); padding: 15px; border-radius: 12px; text-align: center; max-width: 380px; margin: 20px auto; box-shadow: var(--box-shadow); transition: all 0.3s;">
-    <h3 style="margin-top: 0;">🎵 Live Synced Announcement 🎵</h3>
-    
-    <select id="audio-select" onchange="changeTrackBroadcast()">
-      <option value="kontraa-no-sleep-hiphop-music-473847.mp3">kontraa no sleep</option>
-      <option value="XENOGENESIS.mp3">xenogenesis</option>
-      <option value="spotifydown.com - Beautiful Things.mp3">Beautiful Things</option>
-      <option value="C418 - Aria Math (Synthwave).mp3">Aria Math</option>
-      <option value="alex-morgan-calm-still-water-breathing-578483.mp3">calm</option>
-    </select><br>
-
-    <audio id="sync-audio" src="kontraa-no-sleep-hiphop-music-473847.mp3" preload="auto" onended="handleTrackEnd()"></audio>
-    
-    <button id="audio-play-btn" onclick="toggleAudio()" style="background-color: #0088cc; color: #2d2d2d; border: 3px solid var(--element-border); padding: 10px 20px; font-size: 1.1em; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 8px; transition: border-color 0.3s;">
-      ▶️ Play for Everyone
-    </button>
-    
-    <p id="audio-status" style="font-size: 0.85em; font-weight: bold; margin-top: 10px; color: #888;">
-      Connecting to sync network...
-    </p>
-  </div>
-
   <div class="container">
+
+    <!-- LIVE AUDIO PLAYER WIDGET -->
+    <div style="background-color: var(--card-bg); border: 2px solid var(--element-border); border-radius: 12px; padding: 15px; border-radius: 12px; text-align: center; width: 100%; max-width: 480px; margin: 20px auto; box-shadow: 4px 4px 0px var(--shadow);">
+      <div style="margin-bottom: 10px; font-weight: bold;">🔊 Live Synced Announcement 📢</div>
+      
+      <select id="audio-select" onchange="changeTrackBroadcasted()" style="width: 100%; padding: 8px; margin-bottom: 10px; border: 2px solid var(--element-border); border-radius: 4px; background-color: var(--card-bg); color: var(--text-color); font-family: inherit;">
+        <option value="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf7ee.mp3?filename=lofi-study-112191.mp3">LoFi - Lofi Study</option>
+        <option value="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c7a73167.mp3?filename=beautiful-things-105874.mp3">MP3 - Beautiful Things</option>
+        <option value="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a1378873.mp3?filename=water-breathing-579463.mp3">MP3 - Water Breathing</option>
+      </select>
+
+      <audio id="audio-player" src="" preload="auto" ended="handleTrackEnded()"></audio>
+      
+      <button id="audio-play-btn" onclick="toggleAudio()" style="background-color: #ffcc00; color: #000000; border: 2px solid var(--element-border); padding: 10px 20px; font-size: 16px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 5px; box-shadow: var(--small-shadow);">
+        Play for Everyone
+      </button>
+      
+      <div id="status-text" style="margin-top: 8px; font-size: 0.85em; font-weight: bold; margin-top: 10px; color: #666;">
+        Connecting to sync network...
+      </div>
+    </div>
+
     <!-- SELLER SECTION -->
     <div class="seller-section">
-      <h2>⚡ Sell Supa Merch ⚡</h2>
-      <input type="text" id="title" placeholder="Item Name (e.g., Supa Buddy Pin)" required><br>
-      <input type="number" id="price" placeholder="Price ($)" step="0.01" required><br>
+      <h3>🏷️ Sell Dog Man Product 🐾</h3>
+      <input type="text" id="title" placeholder="Product Title (e.g., Lupa Buddy Peg)" required><br>
+      <input type="number" id="price" placeholder="Price (e.g., 9.99)" step="0.01" required><br>
       
-      <input type="text" id="image-url" placeholder="Paste Image URL (https...)"><br>
+      <label style="font-size: 12px; font-weight: bold; display: block; upload image file">Image URL:</label>
+      <input type="text" id="imageURL" placeholder="Paste image URL (https://...)"><br>
       
-      <div style="font-weight: bold; margin: 4px 0;">— OR —</div>
+      <div style="font-size: 12px; font-weight: bold; display: block; upload image file">-- OR --</div>
+      <input type="file" id="imageFile" accept="image/*" style="display: block; upload image file"><br>
+
+      <select id="seller-btn" style="margin-top: 10px; width: 100%;">
+        <option value="dog">Dog</option>
+        <option value="cat">Cat</option>
+        <option value="misc">Misc</option>
+      </select>
       
-      <label style="font-size: 0.85em; font-weight: bold; display: block;">Upload Image File:</label>
-      <input type="file" id="image-file" accept="image/*"><br>
-      
-      <button class="seller-btn" onclick="addItem()">List Item!</button>
+      <button class="seller-btn" onclick="addItem()">List Item</button>
     </div>
 
     <!-- ORDER SECTION -->
     <div class="checkout-section">
-      <h2>📦 Order & Choose Address <span id="cart-badge" style="background:#ff3333; color:#2d2d2d; border:2px solid var(--element-border); padding:2px 6px; border-radius:12px; font-size:0.8em; transition: border-color 0.3s;">(0)</span></h2>
+      <h3>🛒 Order & Choose Address <span id="cart-badge" style="background: #ff3333; color: #ffffff; border: 2px solid var(--element-border); padding: 2px 6px; border-radius: 12px; font-size: 12px;">0</span></h3>
       
-      <select id="cust-name" required>
-        <option value="" disabled selected>-- Select Your Name --</option>
-        <option value="Arthur">Arthur</option>
-        <option value="Denise">Denise</option>
-        <option value="Josh">Josh</option>
-        <option value="Luna">Luna</option>
-      </select><br>
+      <select id="select-item" onchange="updateTotal()" style="display: none;">
+        <option value="" disabled selected>Select Your Item</option>
+      </select>
 
-      <div style="font-weight: bold; margin-top: 5px;">Select Items to Order:</div>
-      <div id="item-checkboxes" class="item-checkbox-container">
-        <p style="margin: 0; color: gray;">No items listed yet.</p>
+      <div style="font-size: 14px; font-weight: bold; margin-top: 5px; text-align: left;">Select Items to Order:</div>
+      <div class="item-checkbox-container" id="item-checkboxes">
+        <span style="font-size: 12px; color: #888; margin: auto;">No items listed yet. :(</span>
       </div>
 
-      <div class="total-box">
-        Total Amount: <span id="live-total">$0.00</span>
-      </div>
+      <div class="total-box">Total Amount: <span id="total-span">$0.00</span></div>
 
-      <div style="font-weight: bold; margin-top: 10px;">Select Delivery Address:</div>
+      <div style="font-size: 14px; font-weight: bold; margin-top: 5px; text-align: left;">Select Delivery Address:</div>
       
-      <!-- Visual Address Menu Cards -->
-      <div class="address-grid">
+      <!-- Scrollable Address Card Grid -->
+      <div class="address-grid" id="address-grid">
         <label class="address-card" onclick="selectAddress(this)">
-          <input type="radio" name="cust-address" value="Bomboklat Street 1">
-          <img src="img-bomboklat1.jpg" alt="Bomboklat Street 1" onerror="this.src='https://via.placeholder.com/100?text=Bomboklat+1'">
-          <span>Bomboklat Street 1</span>
+          <input type="radio" name="card-address" value="Dogbuluk Street 1">
+          <img src="https://via.placeholder.com/100?text=Dogbuluk1" alt="Dogbuluk Street 1">
+          <span>Dogbuluk Street 1</span>
         </label>
-
         <label class="address-card" onclick="selectAddress(this)">
-          <input type="radio" name="cust-address" value="Bomboklat Street 2">
-          <img src="img-bomboklat2.jpg" alt="Bomboklat Street 2" onerror="this.src='https://via.placeholder.com/100?text=Bomboklat+2'">
-          <span>Bomboklat Street 2</span>
+          <input type="radio" name="card-address" value="Dogbuluk Street 2">
+          <img src="https://via.placeholder.com/100?text=Dogbuluk2" alt="Dogbuluk Street 2">
+          <span>Dogbuluk Street 2</span>
         </label>
-
         <label class="address-card" onclick="selectAddress(this)">
-          <input type="radio" name="cust-address" value="Factory Street">
-          <img src="img-factory.jpg" alt="Factory Street" onerror="this.src='https://via.placeholder.com/100?text=Factory'">
+          <input type="radio" name="card-address" value="Factory Street">
+          <img src="https://via.placeholder.com/100?text=Factory" alt="Factory">
           <span>Factory Street</span>
         </label>
-
         <label class="address-card" onclick="selectAddress(this)">
-          <input type="radio" name="cust-address" value="Oral B Street">
-          <img src="img-oralb.jpg" alt="Oral B Street" onerror="this.src='https://via.placeholder.com/100?text=Oral+B'">
-          <span>Oral B Street</span>
+          <input type="radio" name="card-address" value="Tralal Street">
+          <img src="https://via.placeholder.com/100?text=Tralal" alt="Tralal">
+          <span>Tralal Street</span>
         </label>
-
         <label class="address-card" onclick="selectAddress(this)">
-          <input type="radio" name="cust-address" value="Flower Street">
-          <img src="img-flower.jpg" alt="Flower Street" onerror="this.src='https://via.placeholder.com/100?text=Flower'">
+          <input type="radio" name="card-address" value="Flower Street">
+          <img src="https://via.placeholder.com/100?text=Flower" alt="Flower">
           <span>Flower Street</span>
         </label>
-
         <label class="address-card" onclick="selectAddress(this)">
-          <input type="radio" name="cust-address" value="Garage Street">
-          <img src="img-garage.jpg" alt="Garage Street" onerror="this.src='https://via.placeholder.com/100?text=Garage'">
+          <input type="radio" name="card-address" value="Garden Street">
+          <img src="https://via.placeholder.com/100?text=Garden" alt="Garden">
+          <span>Garden Street</span>
+        </label>
+        <label class="address-card" onclick="selectAddress(this)">
+          <input type="radio" name="card-address" value="Garage Street">
+          <img src="https://via.placeholder.com/100?text=Garage" alt="Garage">
           <span>Garage Street</span>
         </label>
-
         <label class="address-card" onclick="selectAddress(this)">
-          <input type="radio" name="cust-address" value="Garden Street 1">
-          <img src="img-garden1.jpg" alt="Garden Street 1" onerror="this.src='https://via.placeholder.com/100?text=Garden+1'">
-          <span>Garden Street 1</span>
-        </label>
-
-        <label class="address-card" onclick="selectAddress(this)">
-          <input type="radio" name="cust-address" value="Garden Street 2">
-          <img src="img-garden2.jpg" alt="Garden Street 2" onerror="this.src='https://via.placeholder.com/100?text=Garden+2'">
-          <span>Garden Street 2</span>
-        </label>
-
-        <label class="address-card" onclick="selectAddress(this)">
-          <input type="radio" name="cust-address" value="Trampoline Street">
-          <img src="img-trampoline.jpg" alt="Trampoline Street" onerror="this.src='https://via.placeholder.com/100?text=Trampoline'">
+          <input type="radio" name="card-address" value="Trampoline Street">
+          <img src="https://via.placeholder.com/100?text=Trampoline" alt="Trampoline">
           <span>Trampoline Street</span>
         </label>
       </div>
 
-      <button class="order-btn" onclick="sendOrder()">Submit Order!</button>
+      <button class="order-btn" onclick="sendOrder()">Submit Order</button>
     </div>
+
   </div>
 
   <!-- SEARCH & FILTER BAR SECTION -->
   <div class="filter-container">
     <div class="search-row">
-      <input type="text" id="search-input" placeholder="🔍 Search items (e.g., Dog Man, Squishy, Purse)..." oninput="displayProducts()">
-      <button class="surprise-btn" onclick="surpriseMe()">🎲 Surprise Me!</button>
+      <input type="text" id="search-input" class="search-input" placeholder="Search items (e.g., Dog Man, Squishy, Purse)..." oninput="displayProducts()">
+      <button class="surprise-btn" onclick="surpriseMe()">Surprise Me! 🎁</button>
     </div>
+    
     <div class="filter-chips-wrapper">
-      <button class="filter-chip active" onclick="setFilter('all', this)">All Items</button>
-      <button class="filter-chip" onclick="setFilter('Dog Man', this)">Dog Man</button>
-      <button class="filter-chip" onclick="setFilter('Squishy', this)">Squishies</button>
-      <button class="filter-chip" onclick="setFilter('Purse', this)">Purses</button>
-      <button class="filter-chip" onclick="setFilter('Federtasche', this)">Federtaschen</button>
-      <button class="filter-chip" onclick="setFilter('Lesezeichen', this)">Bookmarks</button>
-      <button class="filter-chip" onclick="setFilter('Fidget', this)">Fidgets</button>
-      <button class="filter-chip" onclick="setFilter('Algerian', this)">🇩🇿 Algerian</button>
-      <button class="filter-chip" onclick="setFilter('expensive', this)">Expensive</button>
+      <button class="filter-chip filter-chip-active" onclick="setCategory('all', this)">All Items</button>
+      <button class="filter-chip" onclick="setCategory('dog', this)">🐕 Dog</button>
+      <button class="filter-chip" onclick="setCategory('cat', this)">🐈 Cat</button>
+      <button class="filter-chip" onclick="setCategory('misc', this)">🪄 Misc</button>
+      <button class="filter-chip" onclick="setCategory('expensive', this)">💎 Expensive</button>
     </div>
   </div>
 
+  <!-- PRODUCT CONTAINER -->
   <div id="product-container" class="grid"></div>
 
   <script>
     let currentFilter = 'all';
 
     const defaultProducts = [
-      { id: 'def_1', title: 'Algerian Flag Lesezeichen', price: '4.00', image: 'https://via.placeholder.com/120?text=Algerian+Flag' },
-      { id: 'def_2', title: 'Algerian Mint Tea Squishy', price: '9.00', image: 'https://via.placeholder.com/120?text=Algerian+Mint+Tea' },
-      { id: 'def_3', title: 'Aloha Hawaii Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Aloha+Hawaii' },
-      { id: 'def_4', title: 'If you can dream', price: '5.00', image: 'https://via.placeholder.com/120?text=If+You+Can+Dream' },
-      { id: 'def_5', title: 'Egg Squishy', price: '4.00', image: 'https://via.placeholder.com/120?text=Egg+Squishy' },
-      { id: 'def_6', title: 'Weihnachtsbaum Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Weihnachtsbaum+Purse' },
-      { id: 'def_7', title: 'Blue Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blue+Purse' },
-      { id: 'def_8_a', title: 'Pink Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Pink+Purse+1' },
-      { id: 'def_8_b', title: 'Pink Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Pink+Purse+2' },
-      { id: 'def_9', title: 'Blatt Purse', price: '20.00', image: 'https://via.placeholder.com/120?text=Blatt+Purse' },
-      { id: 'def_10', title: 'Moschea Purse', price: '50.00', image: 'https://via.placeholder.com/120?text=Moschea+Purse' },
-      { id: 'def_11', title: 'Small Star Fidget', price: '4.00', image: 'https://via.placeholder.com/120?text=Small+Star+Fidget' },
-      { id: 'def_12', title: 'Big Star Fidget', price: '8.00', image: 'https://via.placeholder.com/120?text=Big+Star+Fidget' },
-      { id: 'def_13', title: 'Sajadah Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Sajadah+Lesezeichen' },
-      { id: 'def_14', title: 'Spezi', price: '5.00', image: 'https://via.placeholder.com/120?text=Spezi' },
-      { id: 'def_15', title: 'Cake Squishy', price: '20.00', image: 'https://via.placeholder.com/120?text=Cake+Squishy' },
-      { id: 'def_16', title: 'Pikachu Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Pikachu+Federtasche' },
-      { id: 'def_17', title: 'Banana Kid Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Banana+Kid+Squishy' },
-      { id: 'def_18', title: 'STW Squishy', price: '50.00', image: 'https://via.placeholder.com/120?text=STW+Squishy' },
-      { id: 'def_19', title: 'Mikey Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=Mikey+Squishy' },
-      { id: 'def_20', title: 'JJ Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=JJ+Squishy' },
-      { id: 'def_21', title: 'SERIE A Squishy', price: '7.00', image: 'https://via.placeholder.com/120?text=SERIE+A+Squishy' },
-      { id: 'def_22', title: 'QuestionMark Block Squish...', price: '2.00', image: 'https://via.placeholder.com/120?text=QuestionMark+Block' },
-      { id: 'def_23', title: '1up squishy', price: '2.00', image: 'https://via.placeholder.com/120?text=1up+squishy' },
-      { id: 'def_24', title: 'Stitch Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Federtasche' },
-      { id: 'def_25', title: 'Herlitz Freedom Tasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Herlitz+Freedom' },
-      { id: 'def_26', title: 'Crocodile Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Crocodile+Federtasche' },
-      { id: 'def_27', title: 'Stitch Legami Federtasche', price: '5.00', image: 'https://via.placeholder.com/120?text=Stitch+Legami' },
-      { id: 'def_28', title: 'Gedagedigedaggedo Leseze...', price: '3.00', image: 'https://via.placeholder.com/120?text=Gedagedigedaggedo' },
-      { id: 'def_29', title: 'Cinnamoroll Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Cinnamoroll' },
-      { id: 'def_30', title: 'Egg Lesezeichen', price: '3.00', image: 'https://via.placeholder.com/120?text=Egg+Lesezeichen' },
-      { id: 'def_31', title: 'Dog Man 12', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+12' },
-      { id: 'def_32', title: 'Dog Man 11', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+11' },
-      { id: 'def_33', title: 'Dog Man 10', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+10' },
-      { id: 'def_34', title: 'Dog Man 9', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+9' },
-      { id: 'def_35', title: 'Dog Man 8', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+8' },
-      { id: 'def_36', title: 'Dog Man 7', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+7' },
-      { id: 'def_37', title: 'Dog Man 6', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+6' },
-      { id: 'def_38', title: 'Dog Man 5', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+5' },
-      { id: 'def_39', title: 'Dog Man 4', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+4' },
-      { id: 'def_40', title: 'Dog Man 3', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+3' },
-      { id: 'def_41', title: 'Dog Man 2', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+2' },
-      { id: 'def_42', title: 'Dog Man 1', price: '11.00', image: 'https://via.placeholder.com/120?text=Dog+Man+1' }
+      { id: 'def_01', title: 'Algerian Flag Lauchskuchen', price: 4.00, image: 'https://via.placeholder.com/100?text=AlgerianFlag' },
+      { id: 'def_02', title: 'Aloha Hawaii Federation', price: 6.00, image: 'https://via.placeholder.com/100?text=AlohaHawaii' },
+      { id: 'def_03', title: 'Big Blue Purse', price: 20.00, image: 'https://via.placeholder.com/100?text=BigBluePurse' },
+      { id: 'def_04', title: 'Pink Purse', price: 20.00, image: 'https://via.placeholder.com/100?text=PinkPurse' },
+      { id: 'def_05', title: 'Small Star Fisher', price: 9.00, image: 'https://via.placeholder.com/100?text=SmallStarFisher' },
+      { id: 'def_06', title: 'Stitch Lederhose', price: 1.00, image: 'https://via.placeholder.com/100?text=StitchLederhose' },
+      { id: 'def_07', title: 'Stitch Eierschecke', price: 3.00, image: 'https://via.placeholder.com/100?text=StitchEierschecke' },
+      { id: 'def_08', title: 'Cake Squidify', price: 7.00, image: 'https://via.placeholder.com/100?text=CakeSquidify' },
+      { id: 'def_09', title: 'Banana Kid Saschy', price: 7.00, image: 'https://via.placeholder.com/100?text=BananaKidSaschy' },
+      { id: 'def_10', title: 'Squishy Fox', price: 7.00, image: 'https://via.placeholder.com/100?text=SquishyFox' },
+      { id: 'def_11', title: 'Squishy Squid', price: 7.00, image: 'https://via.placeholder.com/100?text=SquishySquid' },
+      { id: 'def_12', title: 'QuestionMark Clock', price: 15.00, image: 'https://via.placeholder.com/100?text=QuestionMarkClock' },
+      { id: 'def_13', title: 'Algorithm Federation', price: 5.00, image: 'https://via.placeholder.com/100?text=AlgorithmFederation' },
+      { id: 'def_14', title: 'Pikachu Federation', price: 5.00, image: 'https://via.placeholder.com/100?text=PikachuFederation' },
+      { id: 'def_15', title: 'Gedönsgedöns Uncut', price: 1.00, image: 'https://via.placeholder.com/100?text=Gedönsgedöns' },
+      { id: 'def_16', title: 'Horzilla Federation', price: 5.00, image: 'https://via.placeholder.com/100?text=Horzilla' },
+      { id: 'def_17', title: 'Cinnamonroll Launchccino', price: 0.00, image: 'https://via.placeholder.com/100?text=Cinnamonroll' },
+      { id: 'def_18', title: 'Dog Man 1', price: 11.00, image: 'https://via.placeholder.com/100?text=DogMan1' },
+      { id: 'def_19', title: 'Dog Man 2', price: 11.00, image: 'https://via.placeholder.com/100?text=DogMan2' },
+      { id: 'def_20', title: 'Dog Man 3', price: 11.00, image: 'https://via.placeholder.com/100?text=DogMan3' },
+      { id: 'def_21', title: 'Dog Man 4', price: 11.00, image: 'https://via.placeholder.com/100?text=DogMan4' },
+      { id: 'def_22', title: 'Dog Man 5', price: 11.00, image: 'https://via.placeholder.com/100?text=DogMan5' },
+      { id: 'def_23', title: 'Dog Man 6', price: 11.00, image: 'https://via.placeholder.com/100?text=DogMan6' },
+      { id: 'def_24', title: 'Dog Man 7', price: 11.00, image: 'https://via.placeholder.com/100?text=DogMan7' },
+      { id: 'def_25', title: 'Dog Man 8', price: 11.00, image: 'https://via.placeholder.com/100?text=DogMan8' },
+      { id: 'def_26', title: 'Dog Man 9', price: 11.00, image: 'https://via.placeholder.com/100?text=DogMan9' },
+      { id: 'def_27', title: 'Dog Man 10', price: 11.00, image: 'https://via.placeholder.com/100?text=DogMan10' },
+      { id: 'def_28', title: 'Dog Man 11', price: 11.00, image: 'https://via.placeholder.com/100?text=DogMan11' },
+      { id: 'def_29', title: 'Dog Man 12', price: 11.00, image: 'https://via.placeholder.com/100?text=DogMan12' }
     ];
 
-    // Load products from localStorage or fall back to defaults
-    let productsList = [];
-    try {
-      const savedProducts = localStorage.getItem('dogman_products');
-      if (savedProducts) {
-        productsList = JSON.parse(savedProducts);
-      } else {
-        productsList = [...defaultProducts];
-      }
-    } catch (e) {
-      console.error("Error loading from localStorage:", e);
-      productsList = [...defaultProducts];
-    }
+    let productList = loadFromLocalStorage() || [...defaultProducts];
 
-    function saveToLocalStorage() {
+    function loadFromLocalStorage() {
       try {
-        localStorage.setItem('dogman_products', JSON.stringify(productsList));
+        const saved = localStorage.getItem('dogman_products');
+        return saved ? JSON.parse(saved) : null;
       } catch (e) {
-        console.error("Error saving to localStorage:", e);
+        console.error("Error loading from localStorage", e);
+        return [...defaultProducts];
       }
     }
 
-    function setFilter(category, btnElement) {
+    function saveLocalstorage() {
+      try {
+        localStorage.setItem('dogman_products', JSON.stringify(productList));
+      } catch (e) {
+        console.error("Error saving to localStorage", e);
+      }
+    }
+
+    function setCategory(category, btn) {
       currentFilter = category;
-      document.querySelectorAll('.filter-chip').forEach(btn => btn.classList.remove('active'));
-      btnElement.classList.add('active');
+      document.querySelectorAll('.filter-chip').forEach(chip => chip.classList.remove('active'));
+      btn.classList.add('active');
       displayProducts();
     }
 
-    function selectAddress(cardElement) {
-      document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
-      cardElement.classList.add('selected');
-      const radio = cardElement.querySelector('input[type="radio"]');
+    function selectAddress(card) {
+      document.querySelectorAll('.address-card').forEach(c => c.classList.remove('address-card-selected'));
+      card.classList.add('address-card-selected');
+      const radio = card.querySelector('input[type="radio"]');
       if (radio) radio.checked = true;
     }
 
     function toggleDarkMode() {
-      const body = document.getElementById('page-body');
-      body.classList.toggle('dark-mode');
+      const body = document.body;
+      body.classList.toggle('dark_mode');
+      const isDark = body.classList.contains('dark_mode');
       const btn = document.querySelector('.theme-toggle-btn');
-      if (body.classList.contains('dark-mode')) {
-        btn.innerText = "☀️ Light Mode";
-      } else {
-        btn.innerText = "🌙 Night Mode";
-      }
+      btn.textContent = isDark ? '🌙 Dark Mode' : '☀️ Light Mode';
+      localStorage.setItem('darkMode', isDark);
     }
 
     function surpriseMe() {
-      if (productsList.length === 0) return;
-      const randomItem = productsList[Math.floor(Math.random() * productsList.length)];
-      document.getElementById('search-input').value = randomItem.title;
+      if (productList.length === 0) return;
+      const randomIdx = Math.floor(Math.random() * productList.length);
+      document.getElementById('search-input').value = productList[randomIdx].title;
       displayProducts();
     }
 
-    // ==========================================
-    // 1. PUSHER LIVE SYNC SETUP (AUDIO)
-    // ==========================================
-    const PUSHER_KEY = "3651c3c833375dea577d";
+    // // 1. PUSHER LIVE SYNC SETUP (WEBS)
+    const PUSHER_KEY = "9b3c3b3131cf431e7743";
     const PUSHER_CLUSTER = "eu";
 
     let pusher, channel;
     try {
       pusher = new Pusher(PUSHER_KEY, { cluster: PUSHER_CLUSTER });
-      channel = pusher.subscribe('audio-room');
+      channel = pusher.subscribe('audio-sync-room');
     } catch (e) {
       console.error("Pusher init error:", e);
     }
 
-    const audio = document.getElementById('sync-audio');
+    const audio = document.getElementById('audio-player');
     const audioSelect = document.getElementById('audio-select');
     const playBtn = document.getElementById('audio-play-btn');
-    const statusText = document.getElementById('audio-status');
+    const statusText = document.getElementById('status-text');
 
-    if (pusher) {
-      pusher.connection.bind('connected', () => {
-        statusText.innerText = "Connected! Tap Play to sync.";
-      });
-
+    if (pusher && channel) {
       channel.bind('client-audio-control', function(data) {
-        if (data.track && audioSelect.value !== data.track) {
-          audioSelect.value = data.track;
-          audio.src = data.track;
+        audioSrc = data.track;
+        if (audio.src !== audioSrc) {
+          audio.src = audioSrc;
         }
-
         audio.currentTime = data.time;
 
         if (data.action === 'play') {
-          audio.play().then(() => {
-            playBtn.innerText = "⏸️ Pause for Everyone";
-            statusText.innerText = "Playing in sync!";
-          }).catch(() => {
-            statusText.innerText = "⚠️ Tap anywhere on screen to allow sound!";
-          });
+          audio.play().catch(() => {});
+          playBtn.textContent = 'Pause for Everyone';
+          statusText.textContent = 'Playing in sync';
         } else if (data.action === 'pause') {
           audio.pause();
-          playBtn.innerText = "▶️ Play for Everyone";
-          statusText.innerText = "Paused remotely.";
+          playBtn.textContent = 'Play for Everyone';
+          statusText.textContent = 'Paused remotely';
         }
       });
     }
 
-    function changeTrackBroadcast() {
+    function changeTrackBroadcasted() {
       audio.src = audioSelect.value;
       audio.currentTime = 0;
-      audio.pause();
-      playBtn.innerText = "▶️ Play for Everyone";
-      statusText.innerText = "Track changed. Ready to sync.";
-
-      if (channel) {
-        channel.trigger('client-audio-control', {
-          action: 'pause',
-          time: 0,
-          track: audioSelect.value
-        });
-      }
-    }
-
-    function toggleAudio() {
-      if (audio.paused) {
-        audio.play();
-        playBtn.innerText = "⏸️ Pause for Everyone";
-        statusText.innerText = "Broadcasting Play...";
-
-        if (channel) {
-          channel.trigger('client-audio-control', {
-            action: 'play',
-            time: audio.currentTime,
-            track: audioSelect.value
-          });
-        }
-      } else {
-        audio.pause();
-        playBtn.innerText = "▶️ Play for Everyone";
-        statusText.innerText = "Broadcasting Pause...";
-
-        if (channel) {
-          channel.trigger('client-audio-control', {
-            action: 'pause',
-            time: audio.currentTime,
-            track: audioSelect.value
-          });
-        }
-      }
-    }
-
-    function handleTrackEnd() {
-      let currentIndex = audioSelect.selectedIndex;
-      let nextIndex = (currentIndex + 1) % audioSelect.options.length;
-      
-      audioSelect.selectedIndex = nextIndex;
-      audio.src = audioSelect.value;
-      audio.currentTime = 0;
-
       audio.play().then(() => {
-        playBtn.innerText = "⏸️ Pause for Everyone";
-        statusText.innerText = "Playing next track!";
-
+        playBtn.textContent = 'Pause for Everyone';
+        statusText.textContent = 'Track changed. Ready to sync.';
         if (channel) {
           channel.trigger('client-audio-control', {
             action: 'play',
@@ -779,64 +769,106 @@
           });
         }
       }).catch(() => {
-        statusText.innerText = "⚠️ Tap anywhere on screen to allow sound!";
+        statusText.textContent = 'Tap anywhere on screen to allow sound!';
       });
     }
 
-    // ==========================================
-    // 2. PRODUCT & LOCALSTORAGE LOGIC
-    // ==========================================
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play().then(() => {
+          playBtn.textContent = 'Pause for Everyone';
+          statusText.textContent = 'Broadcasting Play...';
+          if (channel) {
+            channel.trigger('client-audio-control', {
+              action: 'play',
+              time: audio.currentTime,
+              track: audio.src
+            });
+          }
+        }).catch(() => {
+          statusText.textContent = 'Tap anywhere on screen to allow sound!';
+        });
+      } else {
+        audio.pause();
+        playBtn.textContent = 'Play for Everyone';
+        statusText.textContent = 'Broadcasting Pause...';
+        if (channel) {
+          channel.trigger('client-audio-control', {
+            action: 'pause',
+            time: audio.currentTime,
+            track: audio.src
+          });
+        }
+      }
+    }
+
+    function handleTrackEnded() {
+      let currentIndex = audioSelect.selectedIndex;
+      let nextIndex = (currentIndex + 1) % audioSelect.options.length;
+      audioSelect.selectedIndex = nextIndex;
+      audio.src = audioSelect.value;
+      audio.currentTime = 0;
+      audio.play().then(() => {
+        playBtn.textContent = 'Pause for Everyone';
+        statusText.textContent = 'Playing next track';
+        if (channel) {
+          channel.trigger('client-audio-control', {
+            action: 'play',
+            time: 0,
+            track: audio.src
+          });
+        }
+      }).catch(() => {
+        statusText.textContent = 'Tap anywhere on screen to allow sound!';
+      });
+    }
+
+    // // 2. PRODUCT & LOCALSTORAGE LOGIC
     function deleteItem(itemId) {
-      productsList = productsList.filter(p => String(p.id) !== String(itemId));
-      saveToLocalStorage();
+      productList = productList.filter(item => item.id !== String(itemId));
+      saveLocalstorage();
       displayProducts();
     }
 
-    function updateLiveTotal() {
+    function updateTotalPrice() {
       const selectedBoxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked');
       let total = 0;
 
-      selectedBoxes.forEach(cb => {
-        const product = productsList.find(p => String(p.id) === String(cb.value));
-        if (product) total += parseFloat(product.price) || 0;
+      selectedBoxes.forEach(box => {
+        const foundProduct = productList.find(p => p.id === String(box.value));
+        if (foundProduct) total += parseFloat(foundProduct.price) || 0;
       });
 
-      const totalDisplay = document.getElementById('live-total');
-      if (totalDisplay) {
-        totalDisplay.innerText = `$${total.toFixed(2)}`;
-      }
+      const totalDisplay = document.getElementById('total-span');
+      totalDisplay.textContent = `$${total.toFixed(2)}`;
 
       const badge = document.getElementById('cart-badge');
-      if (badge) {
-        badge.innerText = `(${selectedBoxes.length})`;
-      }
+      badge.textContent = selectedBoxes.length;
     }
 
     function updateItemCheckboxes() {
       const container = document.getElementById('item-checkboxes');
       if (!container) return;
 
-      if (!productsList || productsList.length === 0) {
-        container.innerHTML = '<p style="margin: 0; color: gray;">No items available.</p>';
-        updateLiveTotal();
+      if (productList.length === 0) {
+        container.innerHTML = `<span style="font-size: 12px; color: #888; margin: auto;">No items available. :(</span>`;
         return;
       }
 
       const checkedIds = Array.from(document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked'))
-                              .map(cb => cb.value);
+        .map(cb => cb.value);
 
-      container.innerHTML = productsList.map((item) => {
-        const uniqueId = item.id;
-        const isChecked = checkedIds.includes(String(uniqueId)) ? 'checked' : '';
+      container.innerHTML = productList.map(item => {
+        const isChecked = checkedIds.includes(String(item.id)) ? 'checked' : '';
         return `
           <div class="item-checkbox-row">
-            <input type="checkbox" id="item-check-${uniqueId}" value="${uniqueId}" ${isChecked} onchange="updateLiveTotal()">
-            <label for="item-check-${uniqueId}">${item.title} ($${parseFloat(item.price).toFixed(2)})</label>
+            <input type="checkbox" id="chk-${item.id}" value="${item.id}" ${isChecked} onchange="updateTotalPrice()">
+            <label for="chk-${item.id}">${item.title} ($${parseFloat(item.price).toFixed(2)})</label>
           </div>
         `;
       }).join('');
 
-      updateLiveTotal();
+      updateTotalPrice();
     }
 
     function displayProducts() {
@@ -845,48 +877,41 @@
 
       updateItemCheckboxes();
 
-      const searchQuery = document.getElementById('search-input') ? document.getElementById('search-input').value.toLowerCase() : '';
-
-      const filteredProducts = productsList.filter((item) => {
+      const searchQuery = document.getElementById('search-input').value.toLowerCase();
+      const filteredProducts = productList.filter(item => {
         const matchesSearch = item.title.toLowerCase().includes(searchQuery);
-        
+
         let matchesCategory = true;
-        if (currentFilter === 'all') {
-          matchesCategory = true;
-        } else if (currentFilter === 'expensive') {
+        if (currentFilter === 'expensive') {
           matchesCategory = parseFloat(item.price) >= 40;
-        } else {
-          matchesCategory = item.title.toLowerCase().includes(currentFilter.toLowerCase());
+        } else if (currentFilter !== 'all') {
+          matchesCategory = item.id.toLowerCase().includes(currentFilter);
         }
 
         return matchesSearch && matchesCategory;
       });
 
-      if (!filteredProducts || filteredProducts.length === 0) {
-        container.innerHTML = '<p style="font-weight: bold; font-size: 1.2em;">No matching items found!</p>';
+      if (filteredProducts.length === 0) {
+        container.innerHTML = `<p style="text-align: center; font-size: 16px; width: 100%;">No matching items found :(</p>`;
         return;
       }
 
-      container.innerHTML = filteredProducts.map((item) => {
-        const uniqueId = item.id;
-        const safeTitle = (item.title || 'Item').replace(/'/g, "\\'").replace(/"/g, '&quot;');
-        const imgSrc = item.image || 'https://via.placeholder.com/120?text=No+Image';
-        
-        let ribbonHtml = '';
-        if (item.title.toLowerCase().includes('dog man') || item.title.toLowerCase().includes('algerian')) {
-          ribbonHtml = '<div class="ribbon hot">🔥 HOT</div>';
-        }
+      container.innerHTML = filteredProducts.map(item => {
+        const isDog = item.title.toLowerCase().includes('dog') || item.id.toLowerCase().includes('dog');
+        const isCat = item.title.toLowerCase().includes('cat') || item.id.toLowerCase().includes('cat');
+        const ribbonClass = isDog ? 'dog' : (isCat ? 'cat' : 'misc');
+        const ribbonText = isDog ? '🐕 Dog' : (isCat ? '🐈 Cat' : '🪄 Misc');
 
         return `
           <div class="card">
-            <div class="card-top-bar">
-              ${ribbonHtml}
-              <button class="delete-btn" onclick="deleteItem('${uniqueId}')" title="Delete Item">🗑️</button>
+            <div class="card-bar">
+              <span class="ribbon ${ribbonClass}">${ribbonText}</span>
+              <button class="delete-btn" onclick="deleteItem('${item.id}')">Delete Item 🗑️</button>
             </div>
-            <img src="${imgSrc}" alt="${safeTitle}" onerror="this.src='https://via.placeholder.com/120?text=Invalid+Image'">
-            <h4>${safeTitle.length > 25 ? safeTitle.substring(0, 25) + '...' : safeTitle}</h4>
+            <img src="${item.image || 'https://via.placeholder.com/100?text=NoImage'}" alt="${item.title}">
+            <h3>${item.title}</h3>
             <div class="price">$${parseFloat(item.price).toFixed(2)}</div>
-            <button class="buy-btn" onclick="quickBuy('${uniqueId}')">Buy Item</button>
+            <div class="buy-btn" onclick="quickBuy('${item.id}')">Quick Buy ⚡</div>
           </div>
         `;
       }).join('');
@@ -895,127 +920,127 @@
     function addItem() {
       const title = document.getElementById('title').value.trim();
       const price = document.getElementById('price').value.trim();
-      let imageUrl = document.getElementById('image-url').value.trim();
-      const fileInput = document.getElementById('image-file');
+      const imageURL = document.getElementById('imageURL').value.trim();
+      const fileInput = document.getElementById('imageFile');
+      const categoryType = document.getElementById('seller-btn').value;
 
       if (!title || !price) {
-        alert('Please fill in the item name and price!');
+        alert('Please fill in the title and price!');
         return;
-      }
-
-      if (!imageUrl && fileInput.files.length === 0) {
-        alert('Please either paste an Image URL OR upload an Image File!');
-        return;
-      }
-
-      function saveProduct(finalImage) {
-        productsList.unshift({
-          id: 'custom_' + Date.now(),
-          title: title,
-          price: price,
-          image: finalImage
-        });
-
-        saveToLocalStorage();
-
-        document.getElementById('title').value = '';
-        document.getElementById('price').value = '';
-        document.getElementById('image-url').value = '';
-        fileInput.value = '';
-
-        displayProducts();
       }
 
       if (fileInput.files.length > 0) {
         const reader = new FileReader();
         reader.onload = function(e) {
-          saveProduct(e.target.result);
+          saveProductFinal({
+            id: 'custom_' + Date.now(),
+            title: title,
+            price: price,
+            image: e.target.result
+          });
         };
         reader.readAsDataURL(fileInput.files[0]);
       } else {
-        if (!imageUrl.startsWith('http://') && !imageUrl.startsWith('https://')) {
-          imageUrl = 'https://' + imageUrl;
-        }
-        saveProduct(imageUrl);
+        saveProductFinal({
+          id: categoryType + '_' + Date.now(),
+          title: title,
+          price: price,
+          image: imageURL || 'https://via.placeholder.com/100?text=Custom'
+        });
       }
     }
 
+    function saveProductFinal(newProduct) {
+      productList.unshift(newProduct);
+      saveLocalstorage();
+
+      document.getElementById('title').value = '';
+      document.getElementById('price').value = '';
+      document.getElementById('imageURL').value = '';
+      document.getElementById('imageFile').value = '';
+
+      displayProducts();
+    }
+
     function quickBuy(itemId) {
-      const checkboxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]');
-      checkboxes.forEach(cb => {
-        if (cb.value == itemId) {
-          cb.checked = true;
-        }
-      });
-      updateLiveTotal();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const chk = document.getElementById(`chk-${itemId}`);
+      if (chk) {
+        chk.checked = true;
+        updateTotalPrice();
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      }
     }
 
     function sendOrder() {
-      const customer = document.getElementById('cust-name').value;
-      const selectedAddressRadio = document.querySelector('input[name="cust-address"]:checked');
-      const address = selectedAddressRadio ? selectedAddressRadio.value : '';
+      const customerName = document.getElementById('title').value; // placeholder context
       const selectedBoxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked');
+      const selectedAddress = document.querySelector('input[name="card-address"]:checked');
 
-      if (!customer || selectedBoxes.length === 0 || !address) {
-        alert('Please select a name, at least ONE item, and an address!');
+      if (selectedBoxes.length === 0) {
+        alert('Please select at least one item to order!');
+        return;
+      }
+
+      if (!selectedAddress) {
+        alert('Please select a delivery address!');
         return;
       }
 
       const selectedItems = [];
       let totalPrice = 0;
 
-      selectedBoxes.forEach(cb => {
-        const itemId = cb.value;
-        const foundProduct = productsList.find(p => String(p.id) === String(itemId));
+      selectedBoxes.forEach(box => {
+        const foundProduct = productList.find(p => p.id === String(box.value));
         if (foundProduct) {
           selectedItems.push(foundProduct.title);
           totalPrice += parseFloat(foundProduct.price) || 0;
         }
       });
 
-      const formattedTotal = `$${totalPrice.toFixed(2)}`;
-      const FORMSPREE_URL = "https://formspree.io/f/maewbvzr";
+      const FORMAT_TOTAL = `$${totalPrice.toFixed(2)}`;
+      const PUSHER_URL = "https://formspree.io/f/mnevzark";
 
-      fetch(FORMSPREE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      fetch(PUSHER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({
-          "email": "leonifares34@gmail.com",
-          "_replyto": "leonifares34@gmail.com",
-          "Customer Name": customer,
-          "Items Ordered": selectedItems.join(', '),
-          "Total Items": selectedItems.length,
-          "Total Price": formattedTotal,
-          "Delivery Address": address
+          "email": "lupafoeri@gmail.com",
+          "customer_name": "Dog Man Marketplace Customer",
+          "items_ordered": selectedItems.join(', '),
+          "total_price": FORMAT_TOTAL,
+          "selected_items_length": selectedBoxes.length,
+          "DELIVERY_ADDRESS": selectedAddress.value
         })
-      })
-      .then(res => {
+      }).then(res => {
         if (res.ok) {
-          alert(`Order sent successfully! (${selectedItems.length} items ordered for ${formattedTotal})`);
-
-          document.getElementById('cust-name').selectedIndex = 0;
-          document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
-          document.querySelectorAll('input[name="cust-address"]').forEach(r => r.checked = false);
+          alert(`Order sent successfully! (Selected items: ${selectedBoxes.length} items ordered for ${FORMAT_TOTAL})`);
+          
+          document.getElementById('select-item').selectedIndex = 0;
           document.querySelectorAll('#item-checkboxes input[type="checkbox"]').forEach(cb => cb.checked = false);
-          updateLiveTotal();
+          document.querySelectorAll('input[name="card-address"]').forEach(cb => cb.checked = false);
+          document.querySelectorAll('.address-card').forEach(c => c.classList.remove('address-card-selected'));
+          
+          updateTotalPrice();
         } else {
           res.json().then(data => {
-            console.error('Formspree response error:', data);
-            alert('Formspree error: ' + (data.error || 'Check form configuration or monthly limit.'));
+            console.error("Formspree response error:", data);
+            alert("Error! Check form configuration or monthly limit.");
           });
         }
-      })
-      .catch(err => {
-        console.error('Network Error:', err);
-        alert('Network error: ' + err.message);
+      }).catch(err => {
+        console.error("Network error:", err);
+        alert("Network error! 'err.message'");
       });
     }
 
     window.onload = function() {
       displayProducts();
+      const savedDark = localStorage.getItem('darkMode') === 'true';
+      if (savedDark) {
+        document.body.classList.add('dark_mode');
+        document.querySelector('.theme-toggle-btn').textContent = '🌙 Dark Mode';
+      }
     };
   </script>
-
 </body>
 </html>
