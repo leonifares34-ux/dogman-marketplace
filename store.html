@@ -4,25 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dog Man Marketplace</title>
-    <!-- Pusher JS for Live Synced Audio -->
+    <!-- Pusher Script -->
     <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
     <style>
         :root {
             --bg-color: #ffcc00;
-            --card-bg: #ffffff;
             --text-color: #000000;
+            --card-bg: #ffffff;
+            --card-color: #000000;
             --element-border: #000000;
-            --card-bg-hover: #f0f0f0;
+            --header-bg: #ffaa00;
+            --checkout-bg: #fffbe6;
             --box-shadow: 4px 4px 0px #000000;
             --small-shadow: 2px 2px 0px #000000;
         }
 
         body.dark-mode {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --text-color: #e0e0e0;
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --card-bg: #2d2d2d;
+            --card-color: #ffffff;
             --element-border: #ffffff;
-            --card-bg-hover: #2c2c2c;
+            --header-bg: #333333;
+            --checkout-bg: #262626;
             --box-shadow: 4px 4px 0px rgba(255, 255, 255, 0.4);
             --small-shadow: 2px 2px 0px rgba(255, 255, 255, 0.4);
         }
@@ -32,137 +36,124 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 0;
             transition: background-color 0.3s, color 0.3s;
         }
 
         header {
             background-color: var(--header-bg);
-            color: #ff0000;
             padding: 20px;
             text-align: center;
-            border: 4px solid var(--element-border);
+            border-bottom: 4px solid var(--element-border);
             position: relative;
-            box-shadow: var(--box-shadow);
-            transition: border-color 0.3s, background-color 0.3s;
+            transition: background-color 0.3s, border-color 0.3s;
         }
 
-        header h1 {
-            margin: 0;
-            font-size: 3rem;
-            color: #ff0000;
+        body.dark-mode header {
+            background-color: #1f1f1f;
         }
 
-        .theme-toggle {
+        .theme-toggle-btn {
             position: absolute;
-            top: 20px;
             right: 20px;
+            top: 20px;
             background: var(--card-bg);
             color: var(--text-color);
             border: 2px solid var(--element-border);
-            padding: 8px 12px;
-            font-size: 1rem;
-            font-weight: bold;
+            border-radius: 8px;
+            padding: 10px 15px;
             cursor: pointer;
+            font-weight: bold;
             box-shadow: var(--small-shadow);
             font-family: inherit;
-            border-radius: 8px;
-            transition: border-color 0.3s, background-color 0.3s;
+            transition: transform 0.1s, box-shadow: 0.1s;
+        }
+
+        .theme-toggle-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: none;
         }
 
         .container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
+            max-width: 1200px;
             margin: 20px auto;
-            max-width: 1400px;
-            padding: 10px;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
 
         .seller-section, .checkout-section {
-            background: var(--card-bg);
+            background-color: var(--checkout-bg);
             border: 4px solid var(--element-border);
             border-radius: 12px;
             box-shadow: var(--box-shadow);
             padding: 20px;
-            flex: 1;
-            min-width: 320px;
-            max-width: 480px;
-            box-sizing: border-box;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
             text-align: center;
             transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
         }
 
-        .seller-section input, .checkout-section input, .checkout-section select, audio-select {
-            width: 100%;
+        .seller-section input-input, .checkout-section input, .checkout-section select, .audio-select {
+            width: 90%;
             padding: 10px;
-            margin: 8px 0;
+            margin: 10px 0;
             border: 2px solid var(--element-border);
             border-radius: 4px;
-            box-sizing: border-box;
             font-family: inherit;
             background: var(--card-bg);
             color: var(--text-color);
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
         }
 
         .item-checkbox-container {
             max-height: 150px;
             overflow-y: auto;
             border: 2px solid var(--element-border);
-            border-radius: 4px;
             padding: 10px;
             text-align: left;
-            margin-bottom: 10px;
             background: var(--card-bg);
+            margin: 10px 0;
+            border-radius: 4px;
         }
 
         .item-checkbox-row {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 6px;
-        }
-
-        .item-checkbox-row input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            transform: scale(1.3);
-            cursor: pointer;
-        }
-
-        .item-checkbox-row label {
-            font-size: 0.9rem;
-            cursor: pointer;
+            margin-bottom: 8px;
         }
 
         /* Scrollable Address Card Grid */
         .address-grid {
             display: flex;
-            flex-wrap: nowrap;
             gap: 15px;
             overflow-x: auto;
-            margin: 15px auto;
-            max-width: 100%;
-            padding: 10px;
-            scroll-behavior: smooth;
-            border: 2px solid var(--element-border);
-            border-radius: 8px;
-            background: var(--card-bg);
+            padding: 10px 0;
+            justify-content: center;
+            max-height: 250px;
+            box-sizing: border-box;
         }
 
         .address-card {
             background: var(--card-bg);
+            color: var(--text-color);
             border: 2px solid var(--element-border);
             border-radius: 8px;
             padding: 10px;
-            min-width: 140px;
-            max-width: 140px;
+            min-width: 150px;
             text-align: center;
             cursor: pointer;
-            flex: 0 0 auto;
+            box-shadow: var(--small-shadow);
             transition: transform 0.1s, border-color 0.3s, background-color 0.3s;
-            box-sizing: border-box;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .address-card:hover {
@@ -179,113 +170,81 @@
             object-fit: cover;
             border-radius: 4px;
             margin-bottom: 4px;
-            border: 2px solid var(--element-border);
+            border: 1px solid var(--element-border);
         }
 
         .address-card span {
-            font-size: 0.8rem;
-            font-weight: bold;
-            display: block;
+            font-size: 12px;
             line-height: 1.1;
+            font-weight: bold;
         }
 
         .address-card-selected {
-            border: 3px solid #ff0000 !important;
-            background-color: #ffe6e6 !important;
-            color: #ff0000;
+            border-color: #ff3333;
+            background-color: #ffe6e6;
+            color: #000000;
         }
 
-        .seller-btn {
-            background: #28a745;
-            color: #ffffff;
-            font-size: 1.2rem;
-            font-weight: bold;
+        .seller-box {
+            background: #ffe6e6;
             border: 2px solid var(--element-border);
-            border-radius: 8px;
-            padding: 12px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
+            font-size: 14px;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
             box-shadow: var(--small-shadow);
-        }
-
-        .seller-btn:hover {
-            background: #218838;
-        }
-
-        .order-btn {
-            background: #ff0000;
-            color: #ffffff;
-            font-size: 1.2rem;
-            font-weight: bold;
-            border: 2px solid var(--element-border);
-            border-radius: 8px;
-            padding: 12px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 10px;
-            box-shadow: var(--small-shadow);
-        }
-
-        .order-btn:hover {
-            background: #cc0000;
         }
 
         /* Search & Filter Bar Styles */
-        .search-container {
+        .search-filter-container {
             display: flex;
-            gap: 15px;
-            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
             margin: 20px auto;
             max-width: 800px;
-            padding: 10px;
+            padding: 0 20px;
+        }
+
+        .search-row {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            gap: 10px;
             flex-wrap: wrap;
         }
 
-        .search-input {
-            flex: 1;
-            min-width: 280px;
-            padding: 12px 18px;
-            font-size: 1.1rem;
+        #search-input {
+            width: 60%;
+            padding: 12px;
+            font-size: 16px;
             border: 3px solid var(--element-border);
-            border-radius: 12px;
+            border-radius: 8px;
+            font-family: inherit;
             background: var(--card-bg);
             color: var(--text-color);
             box-shadow: var(--small-shadow);
-            font-family: inherit;
         }
 
         .surprise-btn {
-            background: #ff47ab;
+            background-color: #ff3333;
             color: #ffffff;
-            font-size: 1.1rem;
-            font-weight: bold;
             border: 3px solid var(--element-border);
-            border-radius: 12px;
-            padding: 12px 24px;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
             box-shadow: var(--small-shadow);
             font-family: inherit;
+            transition: transform 0.1s;
+        }
+
+        .filter-chips {
             display: flex;
-            align-items: center;
             gap: 8px;
-            transition: background 0.2s, transform 0.1s;
-        }
-
-        .surprise-btn:hover {
-            background: #e03d96;
-            transform: translateY(-2px);
-        }
-
-        .filter-chip-wrapper {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            max-width: 1000px;
-            margin: 0 auto 20px auto;
-            padding: 5px;
-            justify-content: center;
             flex-wrap: wrap;
+            justify-content: center;
         }
 
         .filter-chip {
@@ -293,8 +252,8 @@
             color: var(--text-color);
             border: 2px solid var(--element-border);
             border-radius: 20px;
-            padding: 8px 16px;
-            font-size: 0.95rem;
+            padding: 6px 14px;
+            font-size: 14px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: var(--small-shadow);
@@ -302,478 +261,415 @@
             transition: transform 0.1s, background-color 0.3s;
         }
 
-        .filter-chip:hover {
-            transform: translateY(-2px);
-        }
-
         .filter-chip.active {
-            background: #ff0000;
+            background-color: #ff3333;
             color: #ffffff;
-            border-color: var(--element-border);
         }
 
-        /* Grid */
+        /* Grid for products */
         .grid {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
             gap: 20px;
-            justify-content: center;
             padding: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
         }
 
         .card {
             background: var(--card-bg);
+            color: var(--card-color);
             border: 3px solid var(--element-border);
             border-radius: 12px;
-            width: 200px;
-            padding: 15px;
-            box-shadow: var(--box-shadow);
-            position: relative;
+            padding: 12px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            align-items: center;
+            box-shadow: var(--box-shadow);
+            position: relative;
             transition: transform 0.2s, background-color 0.3s;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
         }
 
         .card img {
             width: 100%;
-            height: 150px;
+            height: 140px;
             object-fit: contain;
-            border: 2px solid var(--element-border);
-            border-radius: 8px;
-            margin-bottom: 10px;
-            background: #fff;
+            border-radius: 6px;
+            margin-bottom: 8px;
         }
 
         .card-bar {
             display: flex;
-            width: 100%;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .ribbon {
-            background: #ffe600;
-            color: #000000;
-            padding: 2px 6px;
-            font-size: 0.75rem;
+            background: #ff3333;
+            color: #ffffff;
+            font-size: 11px;
             font-weight: bold;
-            border: 2px solid var(--element-border);
+            padding: 2px 6px;
             border-radius: 4px;
+            border: 1px solid var(--element-border);
         }
 
         .delete-btn {
-            background: #ff4747;
+            background: #ff3333;
             color: #ffffff;
             border: 2px solid var(--element-border);
             border-radius: 4px;
+            font-size: 12px;
             padding: 2px 6px;
-            font-size: 0.75rem;
-            font-weight: bold;
             cursor: pointer;
-        }
-
-        .delete-btn:hover {
-            background: #e03b3b;
+            font-weight: bold;
         }
 
         .price {
-            font-size: 1.1rem;
+            font-size: 16px;
             font-weight: bold;
-            color: #28a745;
-            margin-bottom: 10px;
+            color: #ff3333;
         }
 
         .buy-btn {
-            background: #ff0000;
+            background: #00cc44;
             color: #ffffff;
-            width: 100%;
-            padding: 8px;
-            font-weight: bold;
             border: 2px solid var(--element-border);
             border-radius: 6px;
+            padding: 8px;
+            font-weight: bold;
+            text-align: center;
             cursor: pointer;
-        }
-
-        .buy-btn:hover {
-            background: #cc0000;
+            margin-top: 8px;
         }
 
         .total-box {
-            font-size: 1.2rem;
+            border: 2px dashed var(--element-border);
+            padding: 6px;
+            margin-top: 10px;
             font-weight: bold;
-            margin: 10px 0;
-            color: var(--text-color);
         }
     </style>
 </head>
 <body>
 
     <header>
-        <button class="theme-toggle" onclick="toggleDarkMode()">🌙 Night Mode</button>
-        <h1>🐶 DOG MAN MARKETPLACE 🐱</h1>
+        <button class="theme-toggle-btn" onclick="toggleDarkMode()">🌙 Night Mode</button>
+        <h1>DOG MAN MARKETPLACE</h1>
     </header>
 
-    <!-- LIVE SYNCED AUDIO PLAYER -->
-    <div style="background: var(--card-bg); border: 4px solid var(--element-border); border-radius: 12px; padding: 15px; max-width: 600px; margin: 20px auto; text-align: center; box-shadow: var(--box-shadow);">
-        <h3 style="margin-top: 0;">🎵 Live Synced Announcement 🎵</h3>
-        <select id="audio-select" onchange="changeTrackBroadcast()" style="width: 100%; padding: 10px; border: 2px solid var(--element-border); border-radius: 8px; font-size: 1rem; margin-bottom: 10px;">
-            <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">ontrap as sleep</option>
-            <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3">Beautiful Things</option>
-            <option value="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3">Water Breathing</option>
-        </select>
-        <button id="audio-play-btn" onclick="toggleAudio()" style="background: #28a745; color: #ffffff; border: 2px solid var(--element-border); padding: 12px 20px; font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer; width: 100%;">
-            ▶️ Play for Everyone
-        </button>
-        <p id="audio-status" style="margin-top: 8px; font-size: 0.85rem; font-weight: bold;">Connected! Tap Play to sync.</p>
+    <div class="search-filter-container">
+        <div class="search-row">
+            <input type="text" id="search-input" placeholder="Search items (e.g., Dog Man, Squishy, Purse)..." oninput="displayProducts()">
+            <button class="surprise-btn" onclick="surpriseMe()">Surprise Me! 🎁</button>
+        </div>
+        <div class="filter-chips">
+            <button class="filter-chip active" onclick="setCategory('all')">All Items</button>
+            <button class="filter-chip" onclick="setCategory('dogman')">Dog Man</button>
+            <button class="filter-chip" onclick="setCategory('stitch')">Stitch</button>
+            <button class="filter-chip" onclick="setCategory('expensive')">Expensive (> $40)</button>
+        </div>
     </div>
 
     <div class="container">
         <!-- SELLER SECTION -->
         <div class="seller-section">
-            <h2>🛒 Sell Supa Merch</h2>
-            <label style="font-size: 0.9rem; font-weight: bold; display: block; text-align: left;">Item Name (e.g., Supa Buddy Pin)</label>
-            <input type="text" id="title-val" placeholder="Item Name (e.g., Supa Buddy Pin)" required>
-
-            <label style="font-size: 0.9rem; font-weight: bold; display: block; text-align: left;">Price ($)</label>
-            <input type="number" id="price-val" placeholder="Price ($)" step="0.01" required>
-
-            <label style="font-size: 0.9rem; font-weight: bold; display: block; text-align: left;">Paste Image URL (https://...)</label>
-            <input type="text" id="image-val" placeholder="Paste Image URL (https://...)">
-
-            <div style="font-weight: bold; margin: 10px 0;">— OR —</div>
-
-            <label style="font-size: 0.9rem; font-weight: bold; display: block; text-align: left;">Upload Image File:</label>
-            <input type="file" id="file-val" accept="image/*">
-
-            <button class="seller-btn" onclick="addItem()">List Item!</button>
+            <h2>🛒 Sell Mega Merch</h2>
+            <input type="text" id="title" placeholder="Title (e.g., Super Buddy Figurine)" required>
+            <input type="number" id="price" placeholder="Price ($)" step="0.01" required>
+            <input type="text" id="image" placeholder="Paste Image URL (https://...)">
+            <input type="file" id="imageFile" accept="image/*" style="display: block; margin: 10px auto;">
+            <button class="seller-box" onclick="addItem()">List Item (Upload)</button>
         </div>
 
         <!-- ORDER SECTION -->
         <div class="checkout-section">
             <h2>📦 Order & Choose Address</h2>
-            <select id="customer-name" style="width: 100%; padding: 10px; margin: 10px 0;">
-                <option value="">- Select Your Name -</option>
+            <select id="customer" onchange="updateTotal()">
+                <option value="" disabled selected>-- Select Your Name --</option>
                 <option value="Arthur">Arthur</option>
-                <option value="Denise">Denise</option>
+                <option value="Dora">Dora</option>
+                <option value="Lara">Lara</option>
             </select>
-
-            <div style="font-size: 0.9rem; font-weight: bold; text-align: left; margin-top: 10px;">Select Items to Order:</div>
-            <div class="item-checkbox-container" id="item-checkbox-container">
+            <div style="margin: 10px 0; font-weight: bold;">Select Items to Order:</div>
+            <div class="item-checkbox-container" id="item-checkboxes">
                 <!-- Checkboxes populated via JS -->
             </div>
-
-            <div class="total-box">Total Amount: $<span id="total-val">0.00</span></div>
-
-            <label style="font-size: 0.9rem; font-weight: bold; display: block; text-align: left; margin-top: 10px;">Select Delivery Address:</label>
+            <div class="total-box">Total Amount: <span id="total-sum">$0.00</span></div>
+            <div style="font-weight: bold; margin-top: 10px;">Select Delivery Address:</div>
             <div class="address-grid">
                 <label class="address-card" onclick="selectAddress(this)">
-                    <input type="radio" name="cost-address" value="Dogbull Street 1">
-                    <img src="https://via.placeholder.com/100?text=DogBull1" alt="Dogbull Street 1">
-                    <span>Dogbull Street 1</span>
+                    <input type="radio" name="address" value="Bodokubal Street 1">
+                    <img src="https://via.placeholder.com/100?text=Bodokubal+1">
+                    <span>Bodokubal Street 1</span>
                 </label>
                 <label class="address-card" onclick="selectAddress(this)">
-                    <input type="radio" name="cost-address" value="Dogbull Street 2">
-                    <img src="https://via.placeholder.com/100?text=DogBull2" alt="Dogbull Street 2">
-                    <span>Dogbull Street 2</span>
+                    <input type="radio" name="address" value="Lower Street 2">
+                    <img src="https://via.placeholder.com/100?text=Lower+Street+2">
+                    <span>Lower Street 2</span>
                 </label>
                 <label class="address-card" onclick="selectAddress(this)">
-                    <input type="radio" name="cost-address" value="Factory Street">
-                    <img src="https://via.placeholder.com/100?text=Factory" alt="Factory Street">
-                    <span>Factory Street</span>
+                    <input type="radio" name="address" value="Test Factory">
+                    <img src="https://via.placeholder.com/100?text=Test-Factory">
+                    <span>Test Factory</span>
+                </label>
+                <label class="address-card" onclick="selectAddress(this)">
+                    <input type="radio" name="address" value="Dralel">
+                    <img src="https://via.placeholder.com/100?text=Dralel">
+                    <span>Dralel</span>
+                </label>
+                <label class="address-card" onclick="selectAddress(this)">
+                    <input type="radio" name="address" value="Flower Flower">
+                    <img src="https://via.placeholder.com/100?text=Flower+Flower">
+                    <span>Flower Flower</span>
+                </label>
+                <label class="address-card" onclick="selectAddress(this)">
+                    <input type="radio" name="address" value="Garage Street 1">
+                    <img src="https://via.placeholder.com/100?text=Garage+Street+1">
+                    <span>Garage Street 1</span>
+                </label>
+                <label class="address-card" onclick="selectAddress(this)">
+                    <input type="radio" name="address" value="Garden Garden">
+                    <img src="https://via.placeholder.com/100?text=Garden+Garden">
+                    <span>Garden Garden</span>
+                </label>
+                <label class="address-card" onclick="sizeAddress(this)">
+                    <input type="radio" name="address" value="Trampoline Street">
+                    <img src="https://via.placeholder.com/100?text=Trampoline">
+                    <span>Trampoline Street</span>
                 </label>
             </div>
-
-            <button class="order-btn" onclick="sendOrder()">Submit Order!</button>
+            <button class="buy-btn" onclick="sendOrder()" style="width: 100%; margin-top: 10px;">Submit Order</button>
         </div>
     </div>
 
-    <!-- SEARCH & FILTER BAR -->
-    <div class="search-container">
-        <input type="text" class="search-input" id="search-input" placeholder="Search items (e.g., Dog Man, Squishy, Purse)..." oninput="displayProducts()">
-        <button class="surprise-btn" onclick="surpriseMe()">🎁 Surprise Me!</button>
-    </div>
-
-    <div class="filter-chip-wrapper">
-        <button class="filter-chip active" onclick="setCategory('all', this)">All Items</button>
-        <button class="filter-chip" onclick="setCategory('Dog Man', this)">Dog Man</button>
-        <button class="filter-chip" onclick="setCategory('Squishies', this)">Squishies</button>
-        <button class="filter-chip" onclick="setCategory('Purse', this)">Purse</button>
-        <button class="filter-chip" onclick="setCategory('Federmappen', this)">Federmappen</button>
-        <button class="filter-chip" onclick="setCategory('Bookmarks', this)">Bookmarks</button>
-        <button class="filter-chip" onclick="setCategory('Fidgets', this)">Fidgets</button>
-        <button class="filter-chip" onclick="setCategory('Algerian', this)">Algerian</button>
-        <button class="filter-chip" onclick="setCategory('Expensive', this)">Expensive</button>
-    </div>
-
-    <!-- PRODUCT CATALOG GRID -->
+    <!-- Product Grid -->
     <div id="product-container" class="grid"></div>
 
     <script>
         const defaultProducts = [
-            { id: 'def_01', title: 'Algerian Flag Lausezettel', price: 0.00, image: 'https://via.placeholder.com/200?text=AlgerianFlag' },
-            { id: 'def_02', title: 'Dog Man 12', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan12' },
-            { id: 'def_03', title: 'Dog Man 11', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan11' },
-            { id: 'def_04', title: 'Dog Man 10', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan10' },
+            { id: 'def_01', title: 'Algerian Flag Lesezeichen', price: 0.00, image: 'https://via.placeholder.com/200?text=Algerian+Flag' },
+            { id: 'def_02', title: 'Aloha Hawaii Federtasche', price: 4.00, image: 'https://via.placeholder.com/200?text=Aloha+Hawaii' },
+            { id: 'def_03', title: 'Pink Purse', price: 20.00, image: 'https://via.placeholder.com/200?text=Pink+Purse' },
+            { id: 'def_04', title: 'Blue Purse', price: 20.00, image: 'https://via.placeholder.com/200?text=Blue+Purse' },
+            { id: 'def_05', title: 'Pink Pouch', price: 15.00, image: 'https://via.placeholder.com/200?text=Pink+Pouch' },
+            { id: 'def_06', title: 'Small Star Fidget', price: 5.00, image: 'https://via.placeholder.com/200?text=Small+Star' },
+            { id: 'def_07', title: 'Blue Star Fidget', price: 5.00, image: 'https://via.placeholder.com/200?text=Blue+Star' },
+            { id: 'def_08', title: 'Cake Squishy', price: 7.00, image: 'https://via.placeholder.com/200?text=Cake+Squishy' },
+            { id: 'def_09', title: 'Mickey Squishy', price: 7.00, image: 'https://via.placeholder.com/200?text=Mickey+Squishy' },
+            { id: 'def_10', title: 'Banana Kid Saichy', price: 4.00, image: 'https://via.placeholder.com/200?text=Banana+Saichy' },
+            { id: 'def_11', title: 'Questionmark Rubiks Cube', price: 9.00, image: 'https://via.placeholder.com/200?text=Rubiks+Cube' },
+            { id: 'def_12', title: 'Squishy Squishy', price: 7.00, image: 'https://via.placeholder.com/200?text=Squishy' },
+            { id: 'def_13', title: 'Gedagagedigagedago ...', price: 1.00, image: 'https://via.placeholder.com/200?text=Gedagagedigagedago' },
+            { id: 'def_14', title: 'Stitch Federfasche', price: 3.00, image: 'https://via.placeholder.com/200?text=Stitch+Federfasche' },
+            { id: 'def_15', title: 'Stitch Federetasche', price: 4.00, image: 'https://via.placeholder.com/200?text=Stitch+Federetasche' },
+            { id: 'def_16', title: 'Stitch Geldbörse', price: 5.00, image: 'https://via.placeholder.com/200?text=Stitch+Geldbörse' },
+            { id: 'def_17', title: 'Stitch Kosmetiktasche', price: 6.00, image: 'https://via.placeholder.com/200?text=Stitch+Kosmetik' },
+            { id: 'def_18', title: 'Stitch Rucksack', price: 15.00, image: 'https://via.placeholder.com/200?text=Stitch+Rucksack' },
+            { id: 'def_19', title: 'Egg Löschkoffer', price: 1.00, image: 'https://via.placeholder.com/200?text=Egg+Löschkoffer' },
+            { id: 'def_20', title: 'Cinnamoroll Löschkoffer', price: 1.00, image: 'https://via.placeholder.com/200?text=Cinnamoroll' },
+            { id: 'def_21', title: 'Dog Man 1', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan+1' },
+            { id: 'def_22', title: 'Dog Man 2', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan+2' },
+            { id: 'def_23', title: 'Dog Man 3', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan+3' },
+            { id: 'def_24', title: 'Dog Man 4', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan+4' },
+            { id: 'def_25', title: 'Dog Man 5', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan+5' },
+            { id: 'def_26', title: 'Dog Man 6', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan+6' },
+            { id: 'def_27', title: 'Dog Man 7', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan+7' },
+            { id: 'def_28', title: 'Dog Man 8', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan+8' },
+            { id: 'def_29', title: 'Dog Man 9', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan+9' },
+            { id: 'def_30', title: 'Dog Man 10', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan+10' },
+            { id: 'def_31', title: 'Dog Man 11', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan+11' },
+            { id: 'def_32', title: 'Dog Man 12', price: 11.00, image: 'https://via.placeholder.com/200?text=DogMan+12' }
         ];
 
-        let productList = [...defaultProducts];
+        let productsList = [];
         let currentFilter = 'all';
 
-        function loadFromLocalStorage() {
+        try {
             const saved = localStorage.getItem('dogman_products');
             if (saved) {
-                try {
-                    productList = JSON.parse(saved);
-                } catch(e) {
-                    productList = [...defaultProducts];
-                }
+                productsList = JSON.parse(saved);
+            } else {
+                productsList = [...defaultProducts];
             }
+        } catch (e) {
+            productsList = [...defaultProducts];
         }
 
-        function saveToLocalStorage() {
+        function saveLocalStorge() {
             try {
-                localStorage.setItem('dogman_products', JSON.stringify(productList));
-            } catch(e) {
-                console.error("Storage error:", e);
+                localStorage.setItem('dogman_products', JSON.stringify(productsList));
+            } catch (e) {
+                console.error("Error saving to localStorage", e);
             }
         }
 
-        function setCategory(cat, element) {
+        function setCategory(cat) {
             currentFilter = cat;
-            document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
-            element.classList.add('active');
+            document.querySelectorAll('.filter-chip').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
             displayProducts();
         }
 
-        function selectAddress(labelElement) {
-            document.querySelectorAll('.address-card').forEach(card => card.classList.remove('address-card-selected'));
-            labelElement.classList.add('address-card-selected');
-            const radio = labelElement.querySelector('input[type="radio"]');
-            if(radio) radio.checked = true;
+        function selectAddress(card) {
+            document.querySelectorAll('.address-card').forEach(c => c.classList.remove('address-card-selected'));
+            card.classList.add('address-card-selected');
+            const radio = card.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
         }
 
         function toggleDarkMode() {
             const body = document.body;
             body.classList.toggle('dark-mode');
-            const btn = document.querySelector('.theme-toggle');
-            if(body.classList.contains('dark-mode')) {
-                btn.innerHTML = "☀️ Light Mode";
+            const btn = document.querySelector('.theme-toggle-btn');
+            if (body.classList.contains('dark-mode')) {
+                btn.innerHTML = '☀️ Light Mode';
             } else {
-                btn.innerHTML = "🌙 Night Mode";
+                btn.innerHTML = '🌙 Night Mode';
             }
         }
 
         function surpriseMe() {
-            if (productList.length === 0) return;
-            const randIndex = Math.floor(Math.random() * productList.length);
-            const randomItem = productList[randIndex];
-            document.getElementById('search-input').value = randomItem.title;
+            if (productsList.length === 0) return;
+            const randIndex = Math.floor(Math.random() * productsList.length);
+            document.getElementById('search-input').value = productsList[randIndex].title;
             displayProducts();
-        }
-
-        // Pusher Live Audio Sync
-        const PUSHER_KEY = 'your_pusher_key_here';
-        let pusher = null;
-        let channel = null;
-        const audioElement = new Audio();
-
-        try {
-            pusher = new Pusher(PUSHER_KEY, { cluster: 'eu' });
-            channel = pusher.subscribe('audio-sync');
-
-            channel.bind('client-audio-control', function(data) {
-                audioElement.src = data.track;
-                if (data.action === 'play') {
-                    audioElement.currentTime = data.time;
-                    audioElement.play().catch(() => {});
-                    document.getElementById('audio-status').innerText = "Playing for Everyone";
-                } else if (data.action === 'pause') {
-                    audioElement.pause();
-                    document.getElementById('audio-status').innerText = "Paused remotely";
-                }
-            });
-        } catch(e) {
-            console.error("Pusher init error:", e);
-        }
-
-        function changeTrackBroadcast() {
-            const audioSelect = document.getElementById('audio-select');
-            audioElement.src = audioSelect.value;
-            if(channel) {
-                channel.trigger('client-audio-control', {
-                    action: 'track_changed',
-                    time: 0,
-                    track: audioSelect.value
-                });
-            }
-        }
-
-        function toggleAudio() {
-            if (audioElement.paused) {
-                audioElement.play();
-                document.getElementById('audio-play-btn').innerText = "⏸️ Pause for Everyone";
-                document.getElementById('audio-status').innerText = "Broadcasting Play...";
-                if(channel) {
-                    channel.trigger('client-audio-control', {
-                        action: 'play',
-                        time: audioElement.currentTime,
-                        track: audioElement.src
-                    });
-                }
-            } else {
-                audioElement.pause();
-                document.getElementById('audio-play-btn').innerText = "▶️ Play for Everyone";
-                document.getElementById('audio-status').innerText = "Broadcasting Pause...";
-                if(channel) {
-                    channel.trigger('client-audio-control', {
-                        action: 'pause',
-                        time: audioElement.currentTime,
-                        track: audioElement.src
-                    });
-                }
-            }
-        }
-
-        function deleteItem(id) {
-            productList = productList.filter(item => item.id !== id);
-            saveToLocalStorage();
-            displayProducts();
-            updateCheckboxes();
         }
 
         function updateCheckboxes() {
-            const container = document.getElementById('item-checkbox-container');
-            container.innerHTML = productList.map(item => `
-                <div class="item-checkbox-row">
-                    <input type="checkbox" value="${item.id}" onchange="updateTotal()">
-                    <label>${item.title} ($${Number(item.price).toFixed(2)})</label>
-                </div>
-            `).join('');
-            updateTotal();
+            const container = document.getElementById('item-checkboxes');
+            if (!container) return;
+
+            if (productsList.length === 0) {
+                container.innerHTML = '<p style="color: gray; margin: 0;">No items available.</p>';
+                return;
+            }
+
+            const checkedIDs = Array.from(document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+
+            container.innerHTML = productsList.map(item => {
+                const isChecked = checkedIDs.includes(String(item.id)) ? 'checked' : '';
+                return `
+                    <div class="item-checkbox-row">
+                        <input type="checkbox" id="chk_${item.id}" value="${item.id}" ${isChecked} onchange="updateTotal()">
+                        <label for="chk_${item.id}">${item.title} ($${Number(item.price).toFixed(2)})</label>
+                    </div>
+                `;
+            }).join('');
         }
 
         function updateTotal() {
-            const checkedBoxes = document.querySelectorAll('#item-checkbox-container input[type="checkbox"]:checked');
+            const checkboxes = document.querySelectorAll('#item-checkboxes input[type="checkbox"]:checked');
             let total = 0;
-            checkedBoxes.forEach(box => {
-                const foundProduct = productList.find(p => p.id === box.value);
-                if (foundProduct) total += parseFloat(foundProduct.price) || 0;
+
+            checkboxes.forEach(chk => {
+                const product = productsList.find(p => String(p.id) === String(chk.value));
+                if (product) total += parseFloat(product.price) || 0;
             });
-            document.getElementById('total-val').innerText = total.toFixed(2);
+
+            const totalDisplay = document.getElementById('total-sum');
+            if (totalDisplay) totalDisplay.innerText = `$${total.toFixed(2)}`;
         }
 
         function displayProducts() {
             const container = document.getElementById('product-container');
-            if(!container) return;
+            if (!container) return;
+
+            updateCheckboxes();
 
             const searchQuery = document.getElementById('search-input').value.toLowerCase();
-            const filteredProducts = productList.filter(item => {
-                const matchesSearch = item.title.toLowerCase().includes(searchQuery);
+
+            const filteredProducts = productsList.filter(item => {
+                const titleLower = item.title.toLowerCase();
+                const matchesSearch = titleLower.includes(searchQuery);
+
                 let matchesCategory = true;
-                if(currentFilter === 'Expensive') {
-                    matchesCategory = parseFloat(item.price) >= 40;
-                } else if(currentFilter !== 'all') {
-                    matchesCategory = item.title.toLowerCase().includes(currentFilter.toLowerCase());
+                if (currentFilter === 'dogman') {
+                    matchesCategory = titleLower.includes('dog man') || titleLower.includes('dogman');
+                } else if (currentFilter === 'stitch') {
+                    matchesCategory = titleLower.includes('stitch');
+                } else if (currentFilter === 'expensive') {
+                    matchesCategory = parseFloat(item.price) > 40;
                 }
+
                 return matchesSearch && matchesCategory;
             });
 
-            container.innerHTML = filteredProducts.map(item => `
-                <div class="card">
-                    <div class="card-bar">
-                        <span class="ribbon">Supa</span>
-                        <button class="delete-btn" onclick="deleteItem('${item.id}')">Delete</button>
+            if (filteredProducts.length === 0) {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; font-size: 16px;">No matching items found!</p>';
+                return;
+            }
+
+            container.innerHTML = filteredProducts.map(item => {
+                const isDefault = String(item.id).startsWith('def_');
+                return `
+                    <div class="card">
+                        <div>
+                            <div class="card-bar">
+                                <span class="ribbon">${isDefault ? 'Classic' : 'User'}</span>
+                                ${!isDefault ? `<button class="delete-btn" onclick="deleteItem('${item.id}')">Delete Item</button>` : ''}
+                            </div>
+                            <img src="${item.image}" alt="${item.title}" onerror="this.src='https://via.placeholder.com/200?text=No+Image'">
+                            <div style="font-weight: bold; font-size: 14px; margin-bottom: 4px;">${item.title}</div>
+                        </div>
+                        <div>
+                            <div class="price">$${Number(item.price).toFixed(2)}</div>
+                        </div>
                     </div>
-                    <img src="${item.image || 'https://via.placeholder.com/200'}" alt="${item.title}">
-                    <div style="font-weight: bold; text-align: center; margin-bottom: 5px;">${item.title}</div>
-                    <div class="price">$${Number(item.price).toFixed(2)}</div>
-                    <button class="buy-btn">Buy Item</button>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         function addItem() {
-            const title = document.getElementById('title-val').value.trim();
-            const price = document.getElementById('price-val').value;
-            const imageUrl = document.getElementById('image-val').value.trim();
-            const fileInput = document.getElementById('file-val');
+            const title = document.getElementById('title').value.trim();
+            const price = document.getElementById('price').value;
+            const fileInput = document.getElementById('imageFile');
 
             if (!title || !price) {
-                alert("Please fill in the Item name and price!");
+                alert('Please fill in the title and price!');
                 return;
             }
 
-            function saveProductFinal(finalImg) {
-                productList.push({
-                    id: 'item_' + Date.now(),
-                    title: title,
-                    price: parseFloat(price),
-                    image: finalImg
-                });
-                saveToLocalStorage();
-                document.getElementById('title-val').value = '';
-                document.getElementById('price-val').value = '';
-                document.getElementById('image-val').value = '';
-                document.getElementById('file-val').value = '';
-                displayProducts();
-                updateCheckboxes();
-            }
-
-            if (fileInput.files && fileInput.files[0]) {
+            if (fileInput.files.length > 0) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    saveProductFinal(e.target.result);
+                    saveProductFinal(title, price, e.target.result);
                 };
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
-                saveProductFinal(imageUrl || 'https://via.placeholder.com/200');
+                let image = document.getElementById('image').value.trim();
+                if (!image) image = 'https://via.placeholder.com/200?text=No+Image';
+                saveProductFinal(title, price, image);
             }
         }
 
-        function sendOrder() {
-            const customerName = document.getElementById('customer-name').value;
-            const checkedBoxes = document.querySelectorAll('#item-checkbox-container input[type="checkbox"]:checked');
-            const selectedAddressElement = document.querySelector('input[name="cost-address"]:checked');
-            const address = selectedAddressElement ? selectedAddressElement.value : '';
+        function saveProductFinal(title, price, image) {
+            const newProduct = {
+                id: 'usr_' + Date.now(),
+                title: title,
+                price: parseFloat(price),
+                image: image
+            };
 
-            if (!customerName || checkedBoxes.length === 0 || !address) {
-                alert("Please select a name, at least one item, and an address!");
-                return;
-            }
+            productsList.unshift(newProduct);
+            saveLocalStorge();
 
-            let selectedItems = [];
-            let totalPrice = 0;
+            document.getElementById('title').value = '';
+            document.getElementById('price').value = '';
+            document.getElementById('image').value = '';
+            document.getElementById('imageFile').value = '';
 
-            checkedBoxes.forEach(box => {
-                const found = productList.find(p => p.id === box.value);
-                if (found) {
-                    selectedItems.push(found.title);
-                    totalPrice += parseFloat(found.price);
-                }
-            });
+            displayProducts();
+        }
 
-            // Reset Form on Success
-            document.getElementById('customer-name').value = "";
-            document.querySelectorAll('#item-checkbox-container input[type="checkbox"]').forEach(cb => cb.checked = false);
-            document.querySelectorAll('.address-card').forEach(card => card.classList.remove('address-card-selected'));
-            document.querySelectorAll('input[name="cost-address"]').forEach(r => r.checked = false);
-            updateTotal();
+        function deleteItem(id) {
+            productsList = productsList.filter(item => String(item.id) !== String(id));
+            saveLocalStorge();
             displayProducts();
         }
 
         window.onload = function() {
-            loadFromLocalStorage();
             displayProducts();
-            updateCheckboxes();
         };
     </script>
 </body>
