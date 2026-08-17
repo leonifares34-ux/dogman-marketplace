@@ -1023,14 +1023,13 @@
       });
 
       const formattedTotal = `DZD ${totalPrice.toFixed(2)}`;
-      const FORMSPREE_URL = "https://formspree.io/f/maewbvzr";
+      const WEB3FORMS_URL = "https://api.web3forms.com/submit";
 
-      fetch(FORMSPREE_URL, {
+      fetch(WEB3FORMS_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
-          "email": "leonifares34@gmail.com",
-          "_replyto": "leonifares34@gmail.com",
+          "access_key": "85bec60f-e313-4a0c-9da7-8ab733b15a8a",
           "Customer Name": customer,
           "Items Ordered": selectedItems.join(', '),
           "Total Items": selectedItems.length,
@@ -1049,8 +1048,8 @@
           updateLiveTotal();
         } else {
           res.json().then(data => {
-            console.error('Formspree response error:', data);
-            alert('Formspree error: ' + (data.error || 'Check form configuration or monthly limit.'));
+            console.error('Web3Forms response error:', data);
+            alert('Web3Forms error: ' + (data.error || 'Check form configuration or monthly limit.'));
           });
         }
       })
